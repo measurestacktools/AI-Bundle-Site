@@ -1,6 +1,6 @@
-/* AI Projects Bundle — sales site config + interactions.
+/* AI Projects Bundle — single landing page config + interactions.
    ============================================================
-   STEP-2 PLACEHOLDERS — EDIT THESE WHEN READY:
+   PLACEHOLDERS — EDIT THESE WHEN READY:
    - PAYMENT_URL: paste the Razorpay/payment link here when payment
      goes live. Until then it MUST stay "#" (buttons scroll to
      pricing instead of charging anyone).
@@ -40,11 +40,6 @@ var CONFIG = {
   }
   wireBuy(document.getElementById("buyBtn"));
   wireBuy(document.getElementById("buyBtn2"));
-  document.querySelectorAll("[data-cta]").forEach(function (a) {
-    if (a.id === "buyBtn" || a.id === "buyBtn2") return;
-    if (CONFIG.PAYMENT_URL && CONFIG.PAYMENT_URL !== "#") return;
-    /* nav/hero CTAs keep their #pricing href (native smooth scroll) */
-  });
 
   /* footer placeholders: contact / refund / privacy (coming soon pages) */
   var contact = document.getElementById("contactLink");
@@ -110,7 +105,7 @@ var CONFIG = {
       if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
     });
   }, { threshold: 0.12 });
-  document.querySelectorAll(".card, .pcard, .shots figure, .price-card, .steps li").forEach(function (el) {
+  document.querySelectorAll(".card, .shots figure, .price-card, .steps li").forEach(function (el) {
     el.classList.add("reveal");
     io.observe(el);
   });
@@ -118,7 +113,7 @@ var CONFIG = {
   function toast(msg) {
     var t = document.createElement("div");
     t.textContent = msg;
-    t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#131a29;color:#f2ecdf;border:1px solid rgba(245,165,36,.5);border-radius:10px;padding:12px 18px;font-size:14px;z-index:99";
+    t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#fffdf4;color:#211a10;border:2px solid #211a10;border-radius:10px;padding:12px 18px;font-size:14px;z-index:99;box-shadow:3px 3px 0 #211a10";
     document.body.appendChild(t);
     setTimeout(function () { t.remove(); }, 2600);
   }

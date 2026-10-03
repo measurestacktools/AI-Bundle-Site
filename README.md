@@ -33,14 +33,9 @@ and footer policy links show "coming soon" toasts. No checkout is faked.
 
 ## Structure
 
-Multi-page static store (no backend, no build step):
+Single-page static site (no backend, no build step):
 
-- `index.html` — storefront home (hero, shelves, featured, value, pricing)
-- `shop.html` — all 10 projects + search + category filters
-- `product.html?id=...` — detail page, rendered from `store.js`
-- `cart.html` / `checkout.html` — cart (localStorage) + honest payment placeholder
-- `how.html`, `faq.html`, `refund.html`, `privacy.html` — info pages
-- `store.js` — product data, cart, page renderers
-- `script.js` — CONFIG + nav, FAQ accordion, reveal, buy-button wiring
+- `index.html` — all sections (hero, value, projects, showcase, how, who, included, pricing, FAQ, final CTA, footer)
 - `style.css` — lab-notebook theme, mobile-first
+- `script.js` — CONFIG + nav, FAQ accordion, reveal, buy-button wiring
 - `assets/showcase/*.jpg` — real screenshots from the running apps (optimized)

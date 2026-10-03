@@ -30,16 +30,15 @@
 
 <header class="nav" id="top">
   <div class="wrap nav-inner">
-    <a class="brand" href="index.html" aria-label="AI Projects Bundle home"><b>AB</b>AI Projects Bundle</a>
+    <a class="brand" href="#top" aria-label="AI Projects Bundle home"><b>AB</b>AI Projects Bundle</a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
-      <a href="index.html" aria-current="page">Home</a>
-      
-      <a href="how.html">How it works</a>
-      
+      <a href="#projects">Projects</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
     </nav>
     <div class="nav-cta">
-      <a class="cart-link" href="cart.html" aria-label="Cart">🛒<span data-cart-count hidden>0</span></a>
-      <a class="btn btn-primary btn-sm" href="shop.html">Browse projects</a>
+      <a class="btn btn-primary btn-sm" href="#pricing" data-cta>Get the Bundle</a>
       <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Open menu">☰</button>
     </div>
   </div>
@@ -53,7 +52,7 @@
     <p class="lede">Get 10 complete AI source-code projects designed for students and beginner developers. Run them, understand how they work, customize them, and experiment.</p>
     <div class="hero-cta">
       <a class="btn btn-primary" href="#pricing" data-cta>Get the Bundle</a>
-      <a class="btn btn-ghost" href="#showcase">Explore the Projects</a>
+      <a class="btn btn-ghost" href="#projects">See What's Inside</a>
     </div>
     <div class="trust" aria-label="Bundle facts">
       <span><b>✓</b>10 projects</span><span><b>✓</b>Source code included</span><span><b>✓</b>Downloadable ZIP</span><span><b>✓</b>Bring your own API key</span>
@@ -65,32 +64,9 @@ $ pip install -r requirements.txt   <span class="g">✓ installed</span>
 $ uvicorn app:app --port 8005       <span class="g">✓ live at :8005</span>
 <span class="y">→ open your browser. start roasting.</span></pre>
     </div>
-  </div>
-</section>
-
-<section class="section" id="categories">
-  <div class="wrap">
-    <h2>Shop by shelf</h2>
-    <p class="section-sub">Every project lives in the same bundle — pick a shelf to explore.</p>
-    <div class="shelves" id="shelfRow"></div>
-  </div>
-</section>
-
-<section class="section" id="featured">
-  <div class="wrap">
-    <h2>Featured this week</h2>
-    <p class="section-sub">Crowd favorites to start with. All 10 ship together in one bundle.</p>
-    <div class="grid" id="featuredRow"></div>
-    <p style="margin-top:20px"><a class="btn btn-ghost" href="shop.html">See all 10 projects →</a></p>
-  </div>
-</section>
-
-<!-- 3b SHOWCASE -->
-<section class="section" id="showcase">
-  <div class="wrap">
-    <h2>The full lineup</h2>
-    <p class="section-sub">All 10 projects, each with its own visual identity. Click through to any project page.</p>
-    <div class="grid" id="showcaseRow"></div>
+    <div class="hero-strip" aria-label="Bundle contents preview">
+      <span>👁️ VisionAI</span><span>📄 PDFChat</span><span>🎙️ VoiceAI</span><span>⚔️ StudyBattle</span><span>🧠 MindGame</span><span>🔥 RoastBattle</span><span>🎭 CharacterCreator</span><span>📖 StoryGame</span><span>🔎 MysteryDetective</span><span>💼 InterviewSim</span>
+    </div>
   </div>
 </section>
 
@@ -118,6 +94,90 @@ $ uvicorn app:app --port 8005       <span class="g">✓ live at :8005</span>
         </ul>
       </div>
     </div>
+    <p class="fine">Setup varies by project — each README lists its exact steps. AI features generally need your own free Groq API key.</p>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="wrap">
+    <h2>What's inside</h2>
+    <p class="section-sub">Ten independent projects. Open any folder, follow its README, run it.</p>
+    <div class="grid">
+      <article class="card"><span class="tag">Image AI</span><h3>VisionAI</h3><p>Upload an image, ask AI questions about what it contains.</p><p class="feat">✦ Ask anything about any photo</p><a href="#showcase" data-goto="visionai">Explore →</a></article>
+      <article class="card"><span class="tag">Documents</span><h3>PDFChat</h3><p>Chat with PDFs using local retrieval plus grounded AI answers.</p><p class="feat">✦ Answers cite real page numbers</p><a href="#showcase" data-goto="pdfchat">Explore →</a></article>
+      <article class="card"><span class="tag">Voice</span><h3>VoiceAI</h3><p>Talk to AI with browser speech recognition and speech synthesis.</p><p class="feat">✦ No premium voice service needed</p><a href="#showcase" data-goto="voiceai">Explore →</a></article>
+      <article class="card"><span class="tag">Game</span><h3>StudyBattle</h3><p>An arcade-style AI quiz battle with XP, streaks and boss rounds.</p><p class="feat">✦ Boss round every 5th battle</p><a href="#showcase" data-goto="studybattle">Explore →</a></article>
+      <article class="card"><span class="tag">Game</span><h3>MindGame</h3><p>Choice-based AI personality game with a fun archetype result.</p><p class="feat">✦ Shareable result card</p><a href="#showcase" data-goto="mindgame">Explore →</a></article>
+      <article class="card"><span class="tag">Game</span><h3>RoastBattle</h3><p>Three-round AI roast battle with comebacks and round scores.</p><p class="feat">✦ Final verdict + winner reveal</p><a href="#showcase" data-goto="roastbattle">Explore →</a></article>
+      <article class="card"><span class="tag">Characters</span><h3>CharacterCreator</h3><p>Build AI characters, then chat with them in character.</p><p class="feat">✦ Export your character cards</p><a href="#showcase" data-goto="charactercreator">Explore →</a></article>
+      <article class="card"><span class="tag">Story</span><h3>StoryGame</h3><p>Branching AI adventure with state, inventory and endings.</p><p class="feat">✦ Your choices carry forward</p><a href="#showcase" data-goto="storygame">Explore →</a></article>
+      <article class="card"><span class="tag">Mystery</span><h3>MysteryDetective</h3><p>Solve AI-generated mysteries with evidence and accusation.</p><p class="feat">✦ Evidence board + probe budget</p><a href="#showcase" data-goto="mysterydetective">Explore →</a></article>
+      <article class="card"><span class="tag">Career</span><h3>InterviewSim</h3><p>Mock interviews with AI scoring and a practice report.</p><p class="feat">✦ CV-tailored question plans</p><a href="#showcase" data-goto="interviewsim">Explore →</a></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="showcase">
+  <div class="wrap">
+    <h2>Inside the bundle</h2>
+    <p class="section-sub">Real screenshots from the actual running apps — this is what you get to run and modify.</p>
+    <div class="shots">
+      <figure id="shot-visionai"><img src="assets/showcase/visionai.jpg" alt="VisionAI app: darkroom-style image analysis interface" loading="lazy" /><figcaption>VisionAI — image analysis</figcaption></figure>
+      <figure id="shot-pdfchat"><img src="assets/showcase/pdfchat.jpg" alt="PDFChat app: reading-room PDF chat interface" loading="lazy" /><figcaption>PDFChat — chat with PDFs</figcaption></figure>
+      <figure id="shot-voiceai"><img src="assets/showcase/voiceai.jpg" alt="VoiceAI app: broadcast-console voice interface" loading="lazy" /><figcaption>VoiceAI — talk to AI</figcaption></figure>
+      <figure id="shot-studybattle"><img src="assets/showcase/studybattle.jpg" alt="StudyBattle app: chalkboard quiz duel" loading="lazy" /><figcaption>StudyBattle — quiz duel</figcaption></figure>
+      <figure id="shot-mindgame"><img src="assets/showcase/mindgame.jpg" alt="MindGame app: casino card-table game" loading="lazy" /><figcaption>MindGame — personality game</figcaption></figure>
+      <figure id="shot-roastbattle"><img src="assets/showcase/roastbattle.jpg" alt="RoastBattle app: arcade roast battle arena" loading="lazy" /><figcaption>RoastBattle — roast arena</figcaption></figure>
+      <figure id="shot-charactercreator"><img src="assets/showcase/character.jpg" alt="CharacterCreator app: casting-dossier character sheet" loading="lazy" /><figcaption>CharacterCreator — character forge</figcaption></figure>
+      <figure id="shot-storygame"><img src="assets/showcase/storygame.jpg" alt="StoryGame app: illuminated-tome adventure" loading="lazy" /><figcaption>StoryGame — branching adventure</figcaption></figure>
+      <figure id="shot-mysterydetective"><img src="assets/showcase/mystery.jpg" alt="MysteryDetective app: pulp detective case file" loading="lazy" /><figcaption>MysteryDetective — case files</figcaption></figure>
+      <figure id="shot-interviewsim"><img src="assets/showcase/interview.jpg" alt="InterviewSim app: boardroom interview setup" loading="lazy" /><figcaption>InterviewSim — mock interviews</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="wrap">
+    <h2>From download to running in minutes</h2>
+    <ol class="steps">
+      <li><b>01</b><span><strong>Choose a project</strong>Any of the 10 folders — start with RoastBattle.</span></li>
+      <li><b>02</b><span><strong>Download the bundle</strong>One ZIP with everything inside.</span></li>
+      <li><b>03</b><span><strong>Add your Groq API key</strong>Free at console.groq.com — where the README says.</span></li>
+      <li><b>04</b><span><strong>Install dependencies</strong><code>pip install -r requirements.txt</code>, per README.</span></li>
+      <li><b>05</b><span><strong>Run it locally</strong>One command from the README, open in your browser.</span></li>
+      <li><b>06</b><span><strong>Customize &amp; experiment</strong>Change prompts, themes, rules — it's yours.</span></li>
+    </ol>
+    <p class="fine">Setup requirements vary between projects — each README lists its exact steps.</p>
+  </div>
+</section>
+
+<section class="section" id="who">
+  <div class="wrap">
+    <h2>Built for builders</h2>
+    <div class="who-grid">
+      <div>🎓<h3>College students</h3><p>Real projects to run, break, and learn from — beyond textbook exercises.</p></div>
+      <div>🌱<h3>Beginner developers</h3><p>Readable Python + vanilla JS. No frameworks to fight first.</p></div>
+      <div>🤖<h3>AI enthusiasts</h3><p>Ten different ways to put an LLM to work: vision, voice, RAG, games.</p></div>
+      <div>🔨<h3>Learn-by-builders</h3><p>Practical projects for experimentation and customization.</p></div>
+    </div>
+    <p class="fine">These are learning projects. They don't guarantee jobs, internships, clients, or income — they guarantee real code in your hands.</p>
+  </div>
+</section>
+
+<section class="section" id="get">
+  <div class="wrap">
+    <h2>What you get</h2>
+    <ul class="check">
+      <li>✓ 10 complete AI projects</li>
+      <li>✓ Full source code</li>
+      <li>✓ Project README files</li>
+      <li>✓ Setup instructions</li>
+      <li>✓ <code>.env.example</code> files where applicable</li>
+      <li>✓ Multiple types of AI applications</li>
+      <li>✓ Downloadable ZIP</li>
+      <li>✓ Projects you can customize</li>
+    </ul>
+    <p class="key-note">Your own Groq API key is required for AI functionality where applicable.<br /><strong>API keys are NOT included.</strong></p>
   </div>
 </section>
 
@@ -130,6 +190,22 @@ $ uvicorn app:app --port 8005       <span class="g">✓ live at :8005</span>
       <p class="price-sub">one-time · yours to keep · free Groq key required for AI features</p>
       <a class="btn btn-primary btn-lg" href="#" id="buyBtn" data-cta>Get the Bundle — <span data-price>₹299</span></a>
       <p class="fine">Instant digital download after payment</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap narrow">
+    <h2>Questions, answered</h2>
+    <div class="faq">
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">What exactly do I receive?<span aria-hidden="true">+</span></button><div class="faq-a"><p>A downloadable ZIP containing the 10 projects, their source code, project documentation, and setup files.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Do I get the GitHub repositories?<span aria-hidden="true">+</span></button><div class="faq-a"><p>No. The product is a self-contained downloadable project bundle — everything you need is inside the ZIP. GitHub remains the public development home of the code, but no repository ownership or access is transferred.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Do I need an API key?<span aria-hidden="true">+</span></button><div class="faq-a"><p>Yes, for the AI features: each project uses your own free Groq API key (get one at console.groq.com/keys). Non-AI parts — layouts, game logic, navigation — work without it.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Is this a course?<span aria-hidden="true">+</span></button><div class="faq-a"><p>No. It is a source-code project bundle, not a course, mentorship program, or prompt pack. You learn by running and modifying real projects.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Can I customize the projects?<span aria-hidden="true">+</span></button><div class="faq-a"><p>Yes — that's the point. The full source code is included so you can study it, restyle it, change the AI behavior, and extend it however you like.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Are the projects hosted online?<span aria-hidden="true">+</span></button><div class="faq-a"><p>No. This is a downloadable source-code bundle, not a hosted SaaS product. You run everything on your own computer.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Are API keys included?<span aria-hidden="true">+</span></button><div class="faq-a"><p>No — never. API keys are personal and free to create; you add your own in minutes.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Who is this for?<span aria-hidden="true">+</span></button><div class="faq-a"><p>Students, beginner developers, and anyone who wants practical AI projects to experiment with and customize.</p></div></div>
     </div>
   </div>
 </section>
@@ -149,19 +225,18 @@ $ uvicorn app:app --port 8005       <span class="g">✓ live at :8005</span>
       <strong>AI Projects Bundle</strong>
       <p>10 practical AI projects for learning, experimenting, and building.</p>
     </div>
-    <nav aria-label="Footer"><a href="shop.html">Projects</a><a href="how.html">How It Works</a><a href="faq.html">FAQ</a><a href="#pricing">Get the Bundle</a>
-      
-      
-      <a href="cart.html">Cart</a>
+    <nav aria-label="Footer">
+      <a href="#projects">Projects</a>
+      <a href="#how">How It Works</a>
+      <a href="#faq">FAQ</a>
+      <a href="#pricing">Get the Bundle</a>
       <a href="#" id="contactLink">Contact</a>
-      <a href="refund.html">Refund Policy</a>
-      <a href="privacy.html">Privacy Policy</a>
+      <a href="#" id="refundLink">Refund Policy</a>
+      <a href="#" id="privacyLink">Privacy Policy</a>
     </nav>
   </div>
 </footer>
 
-<script src="store.js"></script>
 <script src="script.js"></script>
-<script>renderHome();</script>
 </body>
 </html>
