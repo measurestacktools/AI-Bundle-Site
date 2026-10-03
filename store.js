@@ -1,55 +1,65 @@
-/* Store data + cart. Single source of truth for products.
-   PAYMENT_URL/CONFIG lives in script.js — checkout reads it from there. */
+/* Store data + cart. Descriptions below are the exact factual project
+   descriptions — do not turn them into marketing claims. */
 var PRODUCTS = [
-  { id: "visionai", name: "VisionAI", tag: "Image AI", price: 0,
+  { id: "visionai", name: "VisionAI", tag: "Image AI",
     img: "assets/showcase/visionai.jpg",
-    short: "Upload an image, ask AI questions about what it contains.",
-    desc: "AI image analysis: upload any photo, screenshot, or document and interrogate it with a Groq vision model. Server-side key, image validation and downscaling included.",
+    short: "AI image analysis that lets you upload an image and ask AI questions about what it contains.",
+    desc: "AI image analysis that lets you upload an image and ask AI questions about what it contains. Images are validated and downscaled server-side before analysis.",
+    tags: ["image upload", "visual Q&A", "Groq vision"],
     feats: ["Ask anything about any photo", "JPG/PNG/WEBP/GIF up to 10MB", "Copy + retry + settings panel"] },
-  { id: "pdfchat", name: "PDFChat", tag: "Documents", price: 0,
+  { id: "pdfchat", name: "PDFChat", tag: "Documents",
     img: "assets/showcase/pdfchat.jpg",
-    short: "Chat with PDFs using local retrieval plus grounded AI answers.",
-    desc: "Upload a text-based PDF. It gets chunked and indexed locally (TF-IDF, no downloads), then Groq answers with real page-number sources. Streaming answers included.",
-    feats: ["Page-number citations", "Streaming answers", "New-thread + remove controls"] },
-  { id: "voiceai", name: "VoiceAI", tag: "Voice", price: 0,
+    short: "Upload a PDF and ask questions using local retrieval plus an AI-generated grounded answer with page sources.",
+    desc: "Upload a PDF and ask questions using local retrieval plus an AI-generated grounded answer with page sources. Documents are indexed in memory; nothing is stored on disk.",
+    tags: ["PDF upload", "page citations", "streaming"],
+    feats: ["Answers cite real page numbers", "Streaming answers", "New-thread + remove controls"] },
+  { id: "voiceai", name: "VoiceAI", tag: "Voice",
     img: "assets/showcase/voiceai.jpg",
-    short: "Talk to AI with browser speech recognition and speech synthesis.",
-    desc: "Mic recording with live VU meter, Groq Whisper transcription, Groq chat, and browser-native speech synthesis. No premium voice service needed.",
+    short: "Voice-based AI interaction using browser speech recognition, Groq AI, and browser-native speech synthesis.",
+    desc: "Voice-based AI interaction using browser speech recognition, Groq AI, and browser-native speech synthesis. No premium voice service required.",
+    tags: ["mic input", "Whisper STT", "no premium TTS"],
     feats: ["Live mic level meter", "60s auto-stop", "Voice picker + replay"] },
-  { id: "studybattle", name: "StudyBattle", tag: "Game", price: 0,
+  { id: "studybattle", name: "StudyBattle", tag: "Game",
     img: "assets/showcase/studybattle.jpg",
-    short: "Arcade-style AI quiz battle with XP, streaks and boss rounds.",
-    desc: "Timed questions, XP, levels, streaks, combos, a boss round every 5th battle, adaptive difficulty, and a validated question bank that never repeats.",
-    feats: ["Boss rounds + 3x XP", "Streak/combo HUD", "Weak-topic report card"] },
-  { id: "mindgame", name: "MindGame", tag: "Game", price: 0,
+    short: "An arcade-style AI quiz battle with timed questions, XP, levels, streaks, combos, boss rounds, and adaptive difficulty.",
+    desc: "An arcade-style AI quiz battle with timed questions, XP, levels, streaks, combos, boss rounds, and adaptive difficulty. Questions are validated so options never repeat.",
+    tags: ["timed quiz", "XP + streaks", "boss rounds"],
+    feats: ["Boss round every 5th battle", "Streak/combo HUD", "Weak-topic report card"] },
+  { id: "mindgame", name: "MindGame", tag: "Game",
     img: "assets/showcase/mindgame.jpg",
-    short: "Choice-based AI personality game with a fun archetype result.",
-    desc: "Answer 6 vivid AI scenarios, pick cards, and get a playful archetype reading with strengths, style and fun weaknesses. Entertainment only — stamped on every screen.",
+    short: "An interactive choice-based AI personality-style game that generates a fun archetype result.",
+    desc: "An interactive choice-based AI personality-style game that generates a fun archetype result. Entertainment only — never a psychological diagnosis.",
+    tags: ["6 scenarios", "archetype result", "just for fun"],
     feats: ["6 AI scenarios", "Shareable result card", "Keyboard shortcuts"] },
-  { id: "roastbattle", name: "RoastBattle", tag: "Game", price: 0,
+  { id: "roastbattle", name: "RoastBattle", tag: "Game",
     img: "assets/showcase/roastbattle.jpg",
-    short: "Three-round AI roast battle with comebacks and round scores.",
-    desc: "Pick a target and a style, trade comebacks across 3 rounds, get scored for fun, and take home a verdict plus a copyable result. Safety redirect keeps it playful.",
+    short: "A playful three-round AI roast battle where users exchange comebacks and receive round scores.",
+    desc: "A playful three-round AI roast battle where users exchange comebacks and receive round scores. Scores are openly for fun; unsafe targets are redirected to harmless ones.",
+    tags: ["3 rounds", "4 styles", "scored for fun"],
     feats: ["4 roast styles", "Animated score reveal", "Copy + replay"] },
-  { id: "charactercreator", name: "CharacterCreator", tag: "Characters", price: 0,
+  { id: "charactercreator", name: "CharacterCreator", tag: "Characters",
     img: "assets/showcase/character.jpg",
-    short: "Create AI characters and chat with them in character.",
-    desc: "Generate full character sheets (stats, backstory, catchphrases), chat in character, modify, export SillyTavern-compatible cards, and get a free AI portrait per character.",
+    short: "Create AI characters with stats, backstory, catchphrases, and an in-character chat experience.",
+    desc: "Create AI characters with stats, backstory, catchphrases, and an in-character chat experience. Export SillyTavern-compatible cards and get a free AI portrait per character.",
+    tags: ["character sheet", "in-character chat", "card export"],
     feats: ["Tavern card export/import", "AI portraits (keyless)", "Optional 18+ mature mode"] },
-  { id: "storygame", name: "StoryGame", tag: "Story", price: 0,
+  { id: "storygame", name: "StoryGame", tag: "Story",
     img: "assets/showcase/storygame.jpg",
-    short: "Branching AI adventure with state, inventory and endings.",
-    desc: "A short, contained adventure (~10 turns, auto-finale by design): persistent world state, inventory, health, flags, custom actions, multiple endings, markdown export.",
+    short: "A branching interactive AI story with persistent state, inventory, flags, custom actions, and multiple endings.",
+    desc: "A branching interactive AI story with persistent state, inventory, flags, custom actions, and multiple endings. A short, contained adventure by design — not an endless RPG.",
+    tags: ["~10 turns", "inventory + health", "multi-endings"],
     feats: ["Story codex panel", "Health + inventory", "Export your tale"] },
-  { id: "mysterydetective", name: "MysteryDetective", tag: "Mystery", price: 0,
+  { id: "mysterydetective", name: "MysteryDetective", tag: "Mystery",
     img: "assets/showcase/mystery.jpg",
-    short: "Solve AI-generated mysteries with evidence and accusation.",
-    desc: "Pulp-detective case files: interrogate suspects, pin evidence on the board, follow the timeline, manage 12 probes and 3 accusations. Culprit locked server-side until reveal.",
+    short: "Investigate AI-generated mystery cases using evidence, timelines, notes, hints, and a final accusation.",
+    desc: "Investigate AI-generated mystery cases using evidence, timelines, notes, hints, and a final accusation. The culprit is locked server-side until the reveal.",
+    tags: ["evidence board", "12 probes", "spoiler-safe"],
     feats: ["Evidence board", "Probe/accusation budget", "Spoiler-safe redaction"] },
-  { id: "interviewsim", name: "InterviewSim", tag: "Career", price: 0,
+  { id: "interviewsim", name: "InterviewSim", tag: "Career",
     img: "assets/showcase/interview.jpg",
-    short: "Mock interviews with AI scoring and a practice report.",
-    desc: "Boardroom-style mock interviews: CV-tailored question plans, voice dictation, follow-ups, speech metrics (WPM, fillers, STAR hints) and a final report. Practice feedback, not employment assessment.",
+    short: "Practice interviews with an AI interviewer, voice dictation, follow-up questions, scoring, and a final practice report.",
+    desc: "Practice interviews with an AI interviewer, voice dictation, follow-up questions, scoring, and a final practice report. Practice-game feedback — not an employment assessment.",
+    tags: ["CV-tailored plan", "speech metrics", "practice report"],
     feats: ["CV upload + tailored plan", "Speech metrics", "Final report card"] }
 ];
 var BUNDLE = { id: "bundle", name: "AI Projects Bundle (all 10 projects)" };
@@ -81,12 +91,15 @@ function productById(id) {
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+function tagChips(p) {
+  return '<div class="ptags">' + p.tags.map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("") + "</div>";
+}
 function cardHTML(p) {
   return '<article class="pcard"><a class="pcover" href="product.html?id=' + p.id + '" aria-label="View ' + esc(p.name) + '">' +
-    '<img src="' + p.img + '" alt="' + esc(p.name) + ' app screenshot" loading="lazy" /></a>' +
+    '<img src="' + p.img + '" alt="' + esc(p.name) + ' app screenshot" loading="lazy" /><span class="ptag">' + esc(p.tag) + '</span></a>' +
     '<div class="pbody"><p class="vendor">AI PROJECTS BUNDLE</p>' +
     '<h3><a href="product.html?id=' + p.id + '">' + esc(p.name) + '</a></h3>' +
-    '<p class="pshort">' + esc(p.short) + '</p>' +
+    '<p class="pshort">' + esc(p.short) + '</p>' + tagChips(p) +
     '<p class="pprice">' + esc(money()) + '</p>' +
     '<button class="btn btn-buy" data-buy>Buy Now</button></div></article>';
 }
@@ -98,16 +111,15 @@ document.addEventListener("click", function (e) {
   Cart.add("bundle");
   location.href = "checkout.html";
 });
-
 function storeToast(msg) {
   var t = document.createElement("div");
   t.textContent = msg;
-  t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#fffdf4;color:#211a10;border:2px solid #211a10;border-radius:10px;padding:12px 18px;font-size:14px;z-index:99;box-shadow:3px 3px 0 #211a10";
+  t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#131a29;color:#f2ecdf;border:1px solid rgba(245,165,36,.5);border-radius:10px;padding:12px 18px;font-size:14px;z-index:99";
   document.body.appendChild(t);
   setTimeout(function () { t.remove(); }, 2200);
 }
 
-/* home: shelves + featured */
+/* home: shelves + featured + full showcase */
 function renderHome() {
   var tags = [], seen = {};
   PRODUCTS.forEach(function (p) { if (!seen[p.tag]) { seen[p.tag] = 1; tags.push(p.tag); } });
@@ -120,6 +132,8 @@ function renderHome() {
     var picks = ["roastbattle", "visionai", "pdfchat", "mysterydetective"];
     feat.innerHTML = picks.map(function (id) { return cardHTML(productById(id)); }).join("");
   }
+  var show = document.getElementById("showcaseRow");
+  if (show) show.innerHTML = PRODUCTS.map(cardHTML).join("");
   updateCartBadge();
 }
 
@@ -164,7 +178,7 @@ function renderProduct() {
     '<p class="fine">Available in: <strong>AI Projects Bundle</strong></p>' +
     '<div class="pricebox"><p class="price">' + esc(money()) + '</p>' +
     '<p class="fine">one-time · all 10 projects · yours to keep</p></div>' +
-    '<p>' + esc(p.desc) + '</p><ul class="feat-list">' +
+    '<p>' + esc(p.desc) + '</p>' + tagChips(p) + '<ul class="feat-list">' +
     p.feats.map(function (f) { return "<li>✓ " + esc(f) + "</li>"; }).join("") + "</ul>" +
     '<p class="fine">Needs your own Groq API key · runs on your computer</p>' +
     '<div class="hero-cta"><button class="btn btn-buy btn-lg" data-buy>🛒 Buy Now</button> ' +

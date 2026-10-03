@@ -9,8 +9,9 @@
    - CONTACT_EMAIL: leave "" until there is a support inbox; the footer
      Contact link stays a harmless placeholder meanwhile.
    ============================================================ */
+const PAYMENT_URL = "#";
 var CONFIG = {
-  PAYMENT_URL: "#",
+  PAYMENT_URL: PAYMENT_URL,
   PRICE: "₹299",
   CONTACT_EMAIL: ""
 };
@@ -117,7 +118,7 @@ var CONFIG = {
   function toast(msg) {
     var t = document.createElement("div");
     t.textContent = msg;
-    t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#fffdf4;color:#211a10;border:2px solid #211a10;border-radius:10px;padding:12px 18px;font-size:14px;z-index:99;box-shadow:3px 3px 0 #211a10";
+    t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#131a29;color:#f2ecdf;border:1px solid rgba(245,165,36,.5);border-radius:10px;padding:12px 18px;font-size:14px;z-index:99";
     document.body.appendChild(t);
     setTimeout(function () { t.remove(); }, 2600);
   }
