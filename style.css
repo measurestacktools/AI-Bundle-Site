@@ -164,6 +164,8 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
 .pricebox .price{font-family:var(--serif);font-size:46px;margin:0}
 .pricebox .fine{margin:6px 0 0}
 .feat-list{list-style:none;margin:16px 0;padding:0;display:grid;gap:9px;font-size:14.5px;color:var(--ink2)}
+.key-steps{margin:12px 0;padding-left:22px;display:grid;gap:10px;color:var(--ink2);font-size:14.5px}
+.key-steps strong{color:var(--ink)}
 
 /* responsive */
 @media (max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}.who-grid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}}
