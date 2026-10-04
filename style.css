@@ -153,6 +153,18 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .45s,transform .45s}
 .reveal.in{opacity:1;transform:none}
 
+/* bundle detail page */
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--faint);margin:0 0 14px}
+.crumbs a{color:var(--ink2)}
+.page-title{font-family:var(--serif);font-size:clamp(28px,4.4vw,44px);margin:0 0 10px;letter-spacing:-.3px}
+.detail{display:grid;grid-template-columns:1.05fr 1fr;gap:30px;align-items:start}
+.dcover img{width:100%;border:2px solid var(--line);border-radius:10px;box-shadow:var(--hard)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--card);background:var(--green);border-radius:999px;padding:5px 13px;margin:0 0 12px}
+.pricebox{background:var(--card);border:2px solid var(--signal);border-radius:10px;padding:18px 22px;margin:18px 0}
+.pricebox .price{font-family:var(--serif);font-size:46px;margin:0}
+.pricebox .fine{margin:6px 0 0}
+.feat-list{list-style:none;margin:16px 0;padding:0;display:grid;gap:9px;font-size:14.5px;color:var(--ink2)}
+
 /* responsive */
 @media (max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}.who-grid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:768px){
@@ -164,6 +176,7 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
   .compare{grid-template-columns:1fr}
   .compare-vs{justify-self:center;transform:rotate(90deg)}
   .grid,.shots,.steps,.check{grid-template-columns:1fr}
+  .detail{grid-template-columns:1fr}
   .who-grid{grid-template-columns:1fr 1fr}
   .hero{padding:44px 0 24px}
   .section{padding:40px 0}

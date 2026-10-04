@@ -24,18 +24,13 @@ var CONFIG = {
     el.textContent = CONFIG.PRICE;
   });
 
-  /* buy buttons: placeholder -> scroll to pricing; live URL -> go pay */
+  /* buy buttons: live URL -> go pay; placeholder -> go to bundle page */
   function wireBuy(btn) {
     if (!btn) return;
     if (CONFIG.PAYMENT_URL && CONFIG.PAYMENT_URL !== "#") {
       btn.setAttribute("href", CONFIG.PAYMENT_URL);
-    } else {
-      btn.addEventListener("click", function (e) {
-        if (btn.id === "buyBtn" || btn.id === "buyBtn2") {
-          e.preventDefault();
-          document.getElementById("pricing").scrollIntoView({ behavior: "smooth" });
-        }
-      });
+    } else if (btn.id === "buyBtn" || btn.id === "buyBtn2") {
+      btn.setAttribute("href", "bundle.html");
     }
   }
   wireBuy(document.getElementById("buyBtn"));

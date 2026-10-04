@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1060">
+  <rect width="800" height="1060" rx="28" fill="#14100b"/>
+  <rect x="14" y="14" width="772" height="1032" rx="20" fill="none" stroke="#f5a524" stroke-width="3"/>
+  <text x="400" y="88" font-family="monospace" font-size="24" letter-spacing="7" fill="#f5a524" text-anchor="middle">10 PROJECTS · SOURCE CODE · ZIP</text>
+  <text x="400" y="188" font-family="Georgia,serif" font-size="88" font-weight="bold" fill="#f6f1e5" text-anchor="middle">AI PROJECTS</text>
+  <text x="400" y="276" font-family="Georgia,serif" font-size="88" font-weight="bold" font-style="italic" fill="#f5a524" text-anchor="middle">BUNDLE</text>
+  <text x="400" y="322" font-family="monospace" font-size="23" fill="#b9a98d" text-anchor="middle">build · run · customize</text>
+  <g font-family="monospace" text-anchor="middle">
+    <rect x="70" y="368" width="310" height="100" rx="12" fill="#1f2937"/><text x="225" y="410" font-size="25" fill="#f6f1e5">👁️ VisionAI</text><text x="225" y="440" font-size="19" fill="#8d99ae">image AI</text>
+    <rect x="420" y="368" width="310" height="100" rx="12" fill="#1f2937"/><text x="575" y="410" font-size="25" fill="#f6f1e5">📄 PDFChat</text><text x="575" y="440" font-size="19" fill="#8d99ae">documents</text>
+    <rect x="70" y="480" width="310" height="100" rx="12" fill="#1f2937"/><text x="225" y="522" font-size="25" fill="#f6f1e5">🎙️ VoiceAI</text><text x="225" y="552" font-size="19" fill="#8d99ae">voice</text>
+    <rect x="420" y="480" width="310" height="100" rx="12" fill="#1f2937"/><text x="575" y="522" font-size="25" fill="#f6f1e5">⚔️ StudyBattle</text><text x="575" y="552" font-size="19" fill="#8d99ae">game</text>
+    <rect x="70" y="592" width="310" height="100" rx="12" fill="#1f2937"/><text x="225" y="634" font-size="25" fill="#f6f1e5">🧠 MindGame</text><text x="225" y="664" font-size="19" fill="#8d99ae">game</text>
+    <rect x="420" y="592" width="310" height="100" rx="12" fill="#1f2937"/><text x="575" y="634" font-size="25" fill="#f6f1e5">🔥 RoastBattle</text><text x="575" y="664" font-size="19" fill="#8d99ae">game</text>
+    <rect x="70" y="704" width="310" height="100" rx="12" fill="#1f2937"/><text x="225" y="746" font-size="25" fill="#f6f1e5">🎭 Characters</text><text x="225" y="776" font-size="19" fill="#8d99ae">create + chat</text>
+    <rect x="420" y="704" width="310" height="100" rx="12" fill="#1f2937"/><text x="575" y="746" font-size="25" fill="#f6f1e5">📖 StoryGame</text><text x="575" y="776" font-size="19" fill="#8d99ae">adventure</text>
+    <rect x="70" y="816" width="310" height="100" rx="12" fill="#1f2937"/><text x="225" y="858" font-size="25" fill="#f6f1e5">🔎 Mystery</text><text x="225" y="888" font-size="19" fill="#8d99ae">detective</text>
+    <rect x="420" y="816" width="310" height="100" rx="12" fill="#1f2937"/><text x="575" y="858" font-size="25" fill="#f6f1e5">💼 Interview</text><text x="575" y="888" font-size="19" fill="#8d99ae">practice</text>
+  </g>
+  <circle cx="400" cy="976" r="50" fill="#f5a524"/>
+  <text x="400" y="968" font-family="monospace" font-size="19" font-weight="bold" fill="#241503" text-anchor="middle">ONLY</text>
+  <text x="400" y="1000" font-family="Georgia,serif" font-size="33" font-weight="bold" fill="#241503" text-anchor="middle">₹299</text>
+</svg>
