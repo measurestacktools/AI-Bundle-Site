@@ -12,7 +12,7 @@
 const PAYMENT_URL = "#";
 var CONFIG = {
   PAYMENT_URL: PAYMENT_URL,
-  PRICE: "₹299",
+  PRICE: "₹249",
   CONTACT_EMAIL: ""
 };
 

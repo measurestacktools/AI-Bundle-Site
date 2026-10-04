@@ -23,7 +23,7 @@ Open **`script.js`** — everything is in the `CONFIG` block at the top:
 ```js
 var CONFIG = {
   PAYMENT_URL: "#",        // ← paste Razorpay/payment URL here
-  PRICE: "₹299",           // ← change price once; all [data-price] spots update
+  PRICE: "₹249",           // ← change price once; all [data-price] spots update
   CONTACT_EMAIL: ""        // ← support inbox; footer Contact activates when set
 };
 ```
