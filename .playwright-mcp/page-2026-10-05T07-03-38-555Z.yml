@@ -1,0 +1,303 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "ABAI Projects Bundle" [ref=e5] [cursor=pointer]:
+        - /url: index.html
+      - navigation "Primary" [ref=e6]:
+        - link "Projects" [ref=e7] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "How it works" [ref=e8] [cursor=pointer]:
+          - /url: index.html#how
+        - link "Pricing" [ref=e9] [cursor=pointer]:
+          - /url: index.html#pricing
+        - link "FAQ" [ref=e10] [cursor=pointer]:
+          - /url: index.html#faq
+      - link "Get the Bundle" [ref=e12] [cursor=pointer]:
+        - /url: bundle.html
+  - main [ref=e13]:
+    - generic [ref=e15]:
+      - paragraph [ref=e16]:
+        - link "Home" [ref=e17] [cursor=pointer]:
+          - /url: index.html
+        - text: /
+        - link "Projects" [ref=e18] [cursor=pointer]:
+          - /url: index.html#projects
+        - text: / AI Projects Bundle
+      - generic [ref=e19]:
+        - 'img "AI Projects Bundle cover: box art with all 10 projects" [ref=e21]'
+        - generic [ref=e22]:
+          - paragraph [ref=e23]: ◈ Digital bundle
+          - heading "AI Projects Bundle (10 Projects)" [level=1] [ref=e24]
+          - paragraph [ref=e25]:
+            - text: "Available in:"
+            - strong [ref=e26]: instant download
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: ₹249
+            - paragraph [ref=e29]: one-time · yours to keep · Groq key required for AI features
+          - generic [ref=e30]:
+            - button "🛒 Buy Now" [ref=e31] [cursor=pointer]
+            - button "⤴ Share" [ref=e32] [cursor=pointer]
+          - heading "§ Inside the ZIP" [level=2] [ref=e33]
+          - list [ref=e34]:
+            - listitem [ref=e35]: ✓ 01-VisionAI — image analysis
+            - listitem [ref=e36]: ✓ 02-PDFChat — PDF chat with sources
+            - listitem [ref=e37]: ✓ 03-VoiceAI — voice interaction
+            - listitem [ref=e38]: ✓ 04-StudyBattle — quiz battle
+            - listitem [ref=e39]: ✓ 05-MindGame — personality game
+            - listitem [ref=e40]: ✓ 06-RoastBattle — roast battle
+            - listitem [ref=e41]: ✓ 07-CharacterCreator — AI characters
+            - listitem [ref=e42]: ✓ 08-StoryGame — branching adventure
+            - listitem [ref=e43]: ✓ 09-MysteryDetective — mystery cases
+            - listitem [ref=e44]: ✓ 10-InterviewSim — interview practice
+          - paragraph [ref=e45]:
+            - strong [ref=e46]: API keys are NOT included.
+            - text: Each project runs on your computer with your own free Groq key.
+          - heading "§ Get your free Groq API key (2 minutes)" [level=2] [ref=e47]
+          - list [ref=e48]:
+            - listitem [ref=e49]:
+              - strong [ref=e50]:
+                - text: Go to
+                - link "console.groq.com/keys" [ref=e51] [cursor=pointer]:
+                  - /url: https://console.groq.com/keys
+              - text: and sign up or log in (free).
+            - listitem [ref=e52]:
+              - strong [ref=e53]: Click “Create API Key”.
+              - text: Give it any name, e.g.
+              - code [ref=e54]: my-projects
+              - text: .
+            - listitem [ref=e55]:
+              - strong [ref=e56]: Copy the key.
+              - text: It starts with
+              - code [ref=e57]: gsk_
+              - text: — it is shown only once, so copy it now.
+            - listitem [ref=e58]:
+              - strong [ref=e59]: "Use it in any project, two ways:"
+              - text: A) Open the project's
+              - code [ref=e60]: .env
+              - text: file and set
+              - code [ref=e61]: GROQ_API_KEY=gsk_…your key…
+              - text: ", then restart the app —"
+              - emphasis [ref=e62]: or
+              - text: B) Start the app, open
+              - strong [ref=e63]: Settings
+              - text: ", and paste the key there (lasts until you stop the app)."
+          - paragraph [ref=e64]:
+            - text: Free tier, no card required. Never share your key publicly or commit a
+            - code [ref=e65]: .env
+            - text: file to GitHub.
+    - generic [ref=e67]:
+      - heading "§ Tutorials tell you. Projects show you." [level=2] [ref=e68]
+      - paragraph [ref=e69]: You don't just get instructions. You get the source code for 10 working projects.
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - heading "Prompts / tutorials" [level=3] [ref=e72]
+          - list [ref=e73]:
+            - listitem [ref=e74]: ❌ Steps to follow, nothing to run
+            - listitem [ref=e75]: ❌ Breaks the moment versions change
+            - listitem [ref=e76]: ❌ Nothing of your own at the end
+        - generic [aria-hidden] [ref=e77]: VS
+        - generic [ref=e78]:
+          - heading "Actual projects" [level=3] [ref=e79]
+          - list [ref=e80]:
+            - listitem [ref=e81]: ✓ Full source code you can run today
+            - listitem [ref=e82]: ✓ Setup instructions + README files
+            - listitem [ref=e83]:
+              - text: ✓
+              - code [ref=e84]: .env.example
+              - text: files where applicable
+            - listitem [ref=e85]: ✓ Customize everything; bring your own API key
+    - generic [ref=e87]:
+      - heading "§ What's inside" [level=2] [ref=e88]
+      - paragraph [ref=e89]: Ten independent projects. Open any folder, follow its README, run it.
+      - generic [ref=e90]:
+        - article [ref=e91]:
+          - generic [ref=e92]: Image AI
+          - heading "VisionAI" [level=3] [ref=e93]
+          - paragraph [ref=e94]: Upload an image, ask AI questions about what it contains.
+          - paragraph [ref=e95]: ✦ Ask anything about any photo
+          - link "Explore →" [ref=e96] [cursor=pointer]:
+            - /url: index.html#shot-visionai
+        - article [ref=e97]:
+          - generic [ref=e98]: Documents
+          - heading "PDFChat" [level=3] [ref=e99]
+          - paragraph [ref=e100]: Chat with PDFs using local retrieval plus grounded AI answers.
+          - paragraph [ref=e101]: ✦ Answers cite real page numbers
+          - link "Explore →" [ref=e102] [cursor=pointer]:
+            - /url: index.html#shot-pdfchat
+        - article [ref=e103]:
+          - generic [ref=e104]: Voice
+          - heading "VoiceAI" [level=3] [ref=e105]
+          - paragraph [ref=e106]: Talk to AI with browser speech recognition and speech synthesis.
+          - paragraph [ref=e107]: ✦ No premium voice service needed
+          - link "Explore →" [ref=e108] [cursor=pointer]:
+            - /url: index.html#shot-voiceai
+        - article [ref=e109]:
+          - generic [ref=e110]: Game
+          - heading "StudyBattle" [level=3] [ref=e111]
+          - paragraph [ref=e112]: An arcade-style AI quiz battle with XP, streaks and boss rounds.
+          - paragraph [ref=e113]: ✦ Boss round every 5th battle
+          - link "Explore →" [ref=e114] [cursor=pointer]:
+            - /url: index.html#shot-studybattle
+        - article [ref=e115]:
+          - generic [ref=e116]: Game
+          - heading "MindGame" [level=3] [ref=e117]
+          - paragraph [ref=e118]: Choice-based AI personality game with a fun archetype result.
+          - paragraph [ref=e119]: ✦ Shareable result card
+          - link "Explore →" [ref=e120] [cursor=pointer]:
+            - /url: index.html#shot-mindgame
+        - article [ref=e121]:
+          - generic [ref=e122]: Game
+          - heading "RoastBattle" [level=3] [ref=e123]
+          - paragraph [ref=e124]: Three-round AI roast battle with comebacks and round scores.
+          - paragraph [ref=e125]: ✦ Final verdict + winner reveal
+          - link "Explore →" [ref=e126] [cursor=pointer]:
+            - /url: index.html#shot-roastbattle
+        - article [ref=e127]:
+          - generic [ref=e128]: Characters
+          - heading "CharacterCreator" [level=3] [ref=e129]
+          - paragraph [ref=e130]: Build AI characters, then chat with them in character.
+          - paragraph [ref=e131]: ✦ Export your character cards
+          - link "Explore →" [ref=e132] [cursor=pointer]:
+            - /url: index.html#shot-charactercreator
+        - article [ref=e133]:
+          - generic [ref=e134]: Story
+          - heading "StoryGame" [level=3] [ref=e135]
+          - paragraph [ref=e136]: Branching AI adventure with state, inventory and endings.
+          - paragraph [ref=e137]: ✦ Your choices carry forward
+          - link "Explore →" [ref=e138] [cursor=pointer]:
+            - /url: index.html#shot-storygame
+        - article [ref=e139]:
+          - generic [ref=e140]: Mystery
+          - heading "MysteryDetective" [level=3] [ref=e141]
+          - paragraph [ref=e142]: Solve AI-generated mysteries with evidence and accusation.
+          - paragraph [ref=e143]: ✦ Evidence board + probe budget
+          - link "Explore →" [ref=e144] [cursor=pointer]:
+            - /url: index.html#shot-mysterydetective
+        - article [ref=e145]:
+          - generic [ref=e146]: Career
+          - heading "InterviewSim" [level=3] [ref=e147]
+          - paragraph [ref=e148]: Mock interviews with AI scoring and a practice report.
+          - paragraph [ref=e149]: ✦ CV-tailored question plans
+          - link "Explore →" [ref=e150] [cursor=pointer]:
+            - /url: index.html#shot-interviewsim
+    - generic [ref=e152]:
+      - heading "§ Inside the bundle" [level=2] [ref=e153]
+      - paragraph [ref=e154]: Real screenshots from the actual running apps — this is what you get to run and modify.
+      - generic [ref=e155]:
+        - figure "VisionAI — image analysis" [ref=e156]:
+          - 'img "VisionAI app: darkroom-style image analysis interface" [ref=e157]'
+        - figure "PDFChat — chat with PDFs" [ref=e159]:
+          - 'img "PDFChat app: reading-room PDF chat interface" [ref=e160]'
+        - figure "VoiceAI — talk to AI" [ref=e162]:
+          - 'img "VoiceAI app: broadcast-console voice interface" [ref=e163]'
+        - figure "StudyBattle — quiz duel" [ref=e165]:
+          - 'img "StudyBattle app: chalkboard quiz duel" [ref=e166]'
+        - figure "MindGame — personality game" [ref=e168]:
+          - 'img "MindGame app: casino card-table game" [ref=e169]'
+        - figure "RoastBattle — roast arena" [ref=e171]:
+          - 'img "RoastBattle app: arcade roast battle arena" [ref=e172]'
+        - figure "CharacterCreator — character forge" [ref=e174]:
+          - 'img "CharacterCreator app: casting-dossier character sheet" [ref=e175]'
+        - figure "StoryGame — branching adventure" [ref=e177]:
+          - 'img "StoryGame app: illuminated-tome adventure" [ref=e178]'
+        - figure "MysteryDetective — case files" [ref=e180]:
+          - 'img "MysteryDetective app: pulp detective case file" [ref=e181]'
+        - figure "InterviewSim — mock interviews" [ref=e183]:
+          - 'img "InterviewSim app: boardroom interview setup" [ref=e184]'
+    - generic [ref=e187]:
+      - heading "§ From download to running in minutes" [level=2] [ref=e188]
+      - list [ref=e189]:
+        - listitem [ref=e190]:
+          - generic [ref=e191]: "01"
+          - generic [ref=e192]:
+            - strong [ref=e193]: Choose a project
+            - text: Any of the 10 folders — start with RoastBattle.
+        - listitem [ref=e194]:
+          - generic [ref=e195]: "02"
+          - generic [ref=e196]:
+            - strong [ref=e197]: Download the bundle
+            - text: One ZIP with everything inside.
+        - listitem [ref=e198]:
+          - generic [ref=e199]: "03"
+          - generic [ref=e200]:
+            - strong [ref=e201]: Add your Groq API key
+            - text: Free at console.groq.com — where the README says.
+        - listitem [ref=e202]:
+          - generic [ref=e203]: "04"
+          - generic [ref=e204]:
+            - strong [ref=e205]: Install dependencies
+            - code [ref=e206]: pip install -r requirements.txt
+            - text: ", per README."
+        - listitem [ref=e207]:
+          - generic [ref=e208]: "05"
+          - generic [ref=e209]:
+            - strong [ref=e210]: Run it locally
+            - text: One command from the README, open in your browser.
+        - listitem [ref=e211]:
+          - generic [ref=e212]: "06"
+          - generic [ref=e213]:
+            - strong [ref=e214]: Customize & experiment
+            - text: Change prompts, themes, rules — it's yours.
+      - paragraph [ref=e215]: Setup requirements vary between projects — each README lists its exact steps.
+    - generic [ref=e217]:
+      - heading "§ Built for builders" [level=2] [ref=e218]
+      - generic [ref=e219]:
+        - generic [ref=e220]:
+          - text: 🎓
+          - heading "College students" [level=3] [ref=e221]
+          - paragraph [ref=e222]: Real projects to run, break, and learn from — beyond textbook exercises.
+        - generic [ref=e223]:
+          - text: 🌱
+          - heading "Beginner developers" [level=3] [ref=e224]
+          - paragraph [ref=e225]: Readable Python + vanilla JS. No frameworks to fight first.
+        - generic [ref=e226]:
+          - text: 🤖
+          - heading "AI enthusiasts" [level=3] [ref=e227]
+          - paragraph [ref=e228]: "Ten different ways to put an LLM to work: vision, voice, RAG, games."
+        - generic [ref=e229]:
+          - text: 🔨
+          - heading "Learn-by-builders" [level=3] [ref=e230]
+          - paragraph [ref=e231]: Practical projects for experimentation and customization.
+      - paragraph [ref=e232]: These are learning projects. They don't guarantee jobs, internships, clients, or income — they guarantee real code in your hands.
+    - generic [ref=e234]:
+      - heading "§ What you get" [level=2] [ref=e235]
+      - list [ref=e236]:
+        - listitem [ref=e237]: ✓ 10 complete AI projects
+        - listitem [ref=e238]: ✓ Full source code
+        - listitem [ref=e239]: ✓ Project README files
+        - listitem [ref=e240]: ✓ Setup instructions
+        - listitem [ref=e241]:
+          - text: ✓
+          - code [ref=e242]: .env.example
+          - text: files where applicable
+        - listitem [ref=e243]: ✓ Multiple types of AI applications
+        - listitem [ref=e244]: ✓ Downloadable ZIP
+        - listitem [ref=e245]: ✓ Projects you can customize
+      - paragraph [ref=e246]:
+        - text: Your own Groq API key is required for AI functionality where applicable.
+        - strong [ref=e247]: API keys are NOT included.
+      - paragraph [ref=e248]:
+        - link "Get the Bundle — ₹249" [ref=e249] [cursor=pointer]:
+          - /url: "#buybox"
+  - contentinfo [ref=e250]:
+    - generic [ref=e251]:
+      - generic [ref=e252]:
+        - strong [ref=e253]: AI Projects Bundle
+        - paragraph [ref=e254]: 10 practical AI projects for learning, experimenting, and building.
+      - navigation "Footer" [ref=e255]:
+        - link "Projects" [ref=e256] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "How It Works" [ref=e257] [cursor=pointer]:
+          - /url: index.html#how
+        - link "FAQ" [ref=e258] [cursor=pointer]:
+          - /url: index.html#faq
+        - link "Get the Bundle" [ref=e259] [cursor=pointer]:
+          - /url: bundle.html
+        - link "Contact" [ref=e260] [cursor=pointer]:
+          - /url: "#"
+        - link "Refund Policy" [ref=e261] [cursor=pointer]:
+          - /url: "#"
+        - link "Privacy Policy" [ref=e262] [cursor=pointer]:
+          - /url: "#"
