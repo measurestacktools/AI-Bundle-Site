@@ -184,3 +184,32 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
   .section{padding:40px 0}
 }
 @media (max-width:390px){.who-grid{grid-template-columns:1fr}.hero-cta .btn{width:100%}}
+
+/* ---- product-page polish pass (bundle.html only) ---- */
+.positioning{font-family:var(--serif);font-size:clamp(18px,2.4vw,22px);line-height:1.35;margin:0 0 6px;max-width:24em}
+.positioning-sub{color:var(--ink2);margin:0 0 4px;max-width:36em}
+.onetime{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--signal);margin:4px 0 0}
+.buy-lead{font-family:var(--mono);font-size:14px;font-weight:700;margin:12px 0 8px}
+.buy-list{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:8px;text-align:left;font-size:14.5px;color:var(--ink2)}
+.buy-list li{background:var(--paper);border:1px solid var(--line-soft);border-radius:7px;padding:8px 12px}
+.pricebox .btn,.pricebox .hero-cta{margin-top:4px}
+.ziplist{grid-template-columns:1fr 1fr;column-gap:16px}
+.before-run{font-size:clamp(19px,2.4vw,24px)}
+.info-box{background:var(--card);border:1px dashed var(--line-soft);border-radius:var(--radius);padding:18px 20px;margin-top:12px}
+.info-box .fine{margin-bottom:0}
+.key-steps code,.buy-list{overflow-wrap:anywhere}
+img{max-width:100%}
+.dcover img{height:auto}
+.dcover{position:relative}
+.card h3{font-size:20px}
+.card .feat{margin-top:2px}
+.card a{padding-top:8px}
+@media (max-width:768px){
+  .ziplist{grid-template-columns:1fr}
+  .pricebox{padding:22px 18px}
+}
+@media (max-width:390px){
+  .pricebox .price{font-size:40px}
+  .info-box{padding:14px}
+  .detail .hero-cta .btn{width:100%;text-align:center}
+}
