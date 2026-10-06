@@ -6,8 +6,8 @@
      pricing instead of charging anyone).
    - PRICE: the displayed price. Change once here; every [data-price]
      element on the page updates automatically.
-   - CONTACT_EMAIL: leave "" until there is a support inbox; the footer
-     Contact link stays a harmless placeholder meanwhile.
+   - CONTACT_EMAIL: reserved for the future support inbox; the
+     contact page explains the current status meanwhile.
    ============================================================ */
 const PAYMENT_URL = "#";
 var CONFIG = {
@@ -36,16 +36,7 @@ var CONFIG = {
   wireBuy(document.getElementById("buyBtn"));
   wireBuy(document.getElementById("buyBtn2"));
 
-  /* footer placeholders: contact / refund / privacy (coming soon pages) */
-  var contact = document.getElementById("contactLink");
-  if (contact) {
-    if (CONFIG.CONTACT_EMAIL) contact.setAttribute("href", "mailto:" + CONFIG.CONTACT_EMAIL);
-    else contact.addEventListener("click", function (e) { e.preventDefault(); toast("Contact inbox coming soon — check the FAQ meanwhile."); });
-  }
-  [["refundLink", "Refund policy page coming soon."], ["privacyLink", "Privacy policy page coming soon."]].forEach(function (pair) {
-    var el = document.getElementById(pair[0]);
-    if (el) el.addEventListener("click", function (e) { e.preventDefault(); toast(pair[1]); });
-  });
+  /* footer links are real pages (contact/refund/privacy) — no interception */
 
   /* project card -> showcase figure scroll */
   document.querySelectorAll("[data-goto]").forEach(function (a) {
