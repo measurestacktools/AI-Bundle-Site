@@ -25,7 +25,8 @@ export async function sendPurchaseEmail(env, { to, orderId, downloadUrl, siteUrl
         html:
           `<p>Payment confirmed. Thank you!</p>` +
           `<p><strong>AI Projects Bundle</strong><br/>Order ${escapeHtml(orderId)} · ₹249 one-time</p>` +
-          `<p><a href="${escapeHtml(downloadUrl)}">Download your ZIP</a> — this link expires in 30 minutes. ` +
+          `<p><a href="${escapeHtml(downloadUrl)}">Download your ZIP</a> — ` +
+          `this link is personal to your order and always checks payment status. ` +
           `You can generate a fresh link anytime from your <a href="${escapeHtml(siteUrl)}/success.html?oid=${encodeURIComponent(orderId)}">purchase page</a>.</p>` +
           `<p>Setup: unzip, add your free Groq API key per any project README, run locally.</p>` +
           `<p>Questions: see ${escapeHtml(siteUrl)}/contact.html</p>`,

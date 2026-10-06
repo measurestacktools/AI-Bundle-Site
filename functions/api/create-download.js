@@ -1,9 +1,13 @@
-// POST /api/create-download  { order_id } -> { url, expires_in }
-// GET  /api/download?order_id=... -> 302 to a fresh signed URL.
-// PAID-only gate. Anything else: 403. No order data leaks in errors.
+// GET /api/download?order_id=... — PAID gate, then streams the private ZIP
+// straight from KV. Auth is re-checked on EVERY request (stronger than an
+// expiring bearer URL: refunds/revocation take effect immediately).
+// POST /api/create-download returns this same-origin URL.
 import { isValidOrderId, readJsonBody, json, errorToResponse, rateLimit, clientIp, PRODUCT } from "../_lib/validate.js";
-import { getOrderById, recordDownload } from "../_lib/db.js";
-import { presignedR2GetUrl } from "../_lib/r2sign.js";
+import { getOrderById } from "../_lib/db.js";
+
+function downloadUrl(orderId) {
+  return `/api/download?order_id=${encodeURIComponent(orderId)}`;
+}
 
 async function authorize(env, orderId) {
   if (!isValidOrderId(orderId)) {
@@ -20,12 +24,6 @@ async function authorize(env, orderId) {
   return order;
 }
 
-async function mint(env, order) {
-  const url = await presignedR2GetUrl(env, 1800);
-  await recordDownload(env.DB, order.id);
-  return url;
-}
-
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
@@ -35,10 +33,8 @@ export async function onRequestPost(context) {
     if (!env.DB) return json({ ok: false, error: "Unavailable" }, 503);
     const body = await readJsonBody(request);
     const order = await authorize(env, body.order_id);
-    const url = await mint(env, order);
-    return json({ ok: true, url, expires_in: 1800 });
+    return json({ ok: true, url: downloadUrl(order.id) });
   } catch (err) {
-    if (err.message === "R2 storage is not configured") return json({ ok: false, error: "Unavailable" }, 503);
     return errorToResponse(err);
   }
 }

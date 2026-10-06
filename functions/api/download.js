@@ -1,8 +1,7 @@
-// GET /api/download?order_id=... — same PAID gate, responds with a 302 to a
-// fresh short-lived signed URL (never proxies the ZIP through the worker).
+// GET /api/download?order_id=... — same PAID gate, streams ZIP bytes.
 import { isValidOrderId, json, rateLimit, clientIp, PRODUCT } from "../_lib/validate.js";
 import { getOrderById, recordDownload } from "../_lib/db.js";
-import { presignedR2GetUrl } from "../_lib/r2sign.js";
+import { getBundleBytes, zipResponse } from "../_lib/blob.js";
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -17,9 +16,10 @@ export async function onRequestGet(context) {
     return json({ ok: false }, 403);
   }
   try {
-    const url = await presignedR2GetUrl(env, 1800);
+    const bytes = await getBundleBytes(env);
+    if (!bytes) return json({ ok: false, error: "Unavailable" }, 503);
     await recordDownload(env.DB, order.id);
-    return Response.redirect(url, 302);
+    return zipResponse(bytes);
   } catch {
     return json({ ok: false, error: "Unavailable" }, 503);
   }

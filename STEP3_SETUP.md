@@ -1,8 +1,8 @@
-# STEP 3 — Cashfree + R2 + D1 setup (AI Projects Bundle, ₹249)
+# STEP 3 — Cashfree + Workers KV + D1 setup (AI Projects Bundle, ₹249)
 
 Funnel: bundle.html Buy Now → email modal → `POST /api/create-order` (₹249, server-side)
 → cashfree.js checkout → return `success.html?oid=` → poll `GET /api/payment-status`
-→ webhook verifies + marks PAID → `POST /api/create-download` → 30-min R2 signed URL.
+→ webhook verifies + marks PAID → `POST /api/create-download` → same-origin download streamed from Workers KV.
 
 No secrets live in the repo. Everything secret is a Cloudflare dashboard secret/binding.
 
@@ -20,9 +20,6 @@ Plain variables:
 |---|---|
 | `CASHFREE_ENVIRONMENT` | `sandbox` (use `production` only after sandbox passes) |
 | `SITE_URL` | `https://aiprojectsbundle.pages.dev` |
-| `R2_BUCKET` | your bucket name, e.g. `ai-bundle-private` |
-| `R2_OBJECT_KEY` | `products/ai-projects-bundle-v1.zip` |
-| `R2_ACCOUNT_ID` | Cloudflare account ID (dashboard URL) |
 | `RESEND_FROM` | sender, e.g. `AI Bundle <orders@yourdomain.com>` (only if using email) |
 
 Secrets (Settings → Variables → **Encrypt** / secrets):
@@ -31,20 +28,19 @@ Secrets (Settings → Variables → **Encrypt** / secrets):
 |---|---|
 | `CASHFREE_APP_ID` | `YOUR_CASHFREE_APP_ID` |
 | `CASHFREE_SECRET_KEY` | `YOUR_CASHFREE_SECRET_KEY` |
-| `R2_S3_ACCESS_KEY_ID` | R2 S3 API token access key |
-| `R2_S3_SECRET_ACCESS_KEY` | R2 S3 API token secret |
 | `RESEND_API_KEY` | `YOUR_EMAIL_API_KEY` (optional; flow works without it) |
 
 Apply to **Production and Preview** (or Production only, your call).
 
-## 3. R2 bucket (private)
+## 3. Workers KV bundle storage (private)
 
-1. Dashboard → R2 → Create bucket, e.g. `ai-bundle-private`. Do NOT enable public access.
-2. Upload `AI-Projects-Bundle.zip` as `products/ai-projects-bundle-v1.zip`
-   (wrangler: `wrangler r2 object put ai-bundle-private/products/ai-projects-bundle-v1.zip --file AI-Projects-Bundle.zip`).
-3. R2 → Manage API tokens → Create token with **Object Read** on this bucket only.
-   Put the access key id + secret into `R2_S3_ACCESS_KEY_ID` / `R2_S3_SECRET_ACCESS_KEY`.
-4. Pages project → Settings → Bindings → Add **R2 bucket** binding named `PRODUCT_FILES` (used for existence checks).
+1. Create the namespace: `wrangler kv:namespace create bundle-files`.
+   Put the returned namespace ID into your Pages/Workers config (placeholder only — no real IDs in docs).
+2. Upload (done by the lead — doc only, do not upload here):
+   `wrangler kv:key put ai-projects-bundle-v1.zip --path <zip> --binding BUNDLE_FILES`
+   where `<zip>` is the local bundle file path and key `ai-projects-bundle-v1.zip` lives in namespace `bundle-files`.
+3. Pages project → Settings → Bindings → Add **KV namespace** binding named `BUNDLE_FILES` pointing at namespace `bundle-files`.
+   There is no public URL — the ONLY read path is the Pages Function after the D1 PAID gate.
 
 ## 4. D1 database
 
@@ -87,7 +83,7 @@ Push to `main` (auto-deploy if Git connected) or
 1. Open `/bundle.html` → Buy Now → enter email → pay with a Cashfree test instrument.
 2. Return lands on `success.html` → status becomes PAID → download works.
 3. Check D1 row: status PAID, download_count 1. Confirm no duplicate emails on webhook retry.
-4. Confirm ZIP URL expires (~30 min) and unpaid `order_id` gets 403.
+4. Confirm download is same-origin from Workers KV, auth re-checked on every request, and unpaid `order_id` gets 403.
 
 ## 11. Go production
 
