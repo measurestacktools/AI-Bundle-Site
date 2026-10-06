@@ -240,13 +240,13 @@
   </div>
 </footer>
 <script src="script.js?v=2"></script>
+<script src="assets/checkout.js?v=1"></script>
 <script>
 (function () {
   var buy = document.getElementById("buyNowBtn");
-  if (buy) {
-    if (CONFIG.PAYMENT_URL && CONFIG.PAYMENT_URL !== "#") { buy.outerHTML = '<a class="btn btn-primary btn-lg" href="' + CONFIG.PAYMENT_URL + '">🛒 Buy Now</a>'; }
-    else buy.addEventListener("click", function () { toast("Checkout goes live soon — payment is being connected."); });
-  }
+  if (buy) buy.addEventListener("click", function () {
+    if (window.AIBundleCheckout) window.AIBundleCheckout.openModal();
+  });
   var share = document.getElementById("shareBtn");
   if (share) share.addEventListener("click", function () {
     var data = { title: "AI Projects Bundle (10 Projects)", text: "10 complete AI source-code projects for ₹249.", url: location.href };

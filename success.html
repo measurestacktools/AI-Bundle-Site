@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Order status | AI Projects Bundle</title>
+<meta name="description" content="Check your AI Projects Bundle order status and access your download after confirmed payment." />
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/favicon.ico?v=3" sizes="any" />
+<link rel="icon" href="/assets/favicon.svg?v=3" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3" />
+<meta name="theme-color" content="#211a10" />
+<link rel="stylesheet" href="style.css?v=2" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="top">
+  <div class="wrap nav-inner">
+    <a class="brand" href="index.html"><b>AB</b>AI Projects Bundle</a>
+    <nav class="nav-links" id="navLinks" aria-label="Primary">
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-primary btn-sm" href="bundle.html" data-cta>Get the Bundle</a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Open menu">☰</button>
+    </div>
+  </div>
+</header>
+<main id="main">
+<section class="section">
+  <div class="wrap narrow">
+    <p class="pill">◈ Order status</p>
+    <h1 class="page-title" id="statusTitle">Confirming your payment…</h1>
+    <p class="section-sub" id="statusSub">Please wait while we verify with the payment gateway. This page never assumes success — it checks the order record.</p>
+    <div class="info-box" id="statusBox">
+      <ol class="key-steps" id="statusSteps">
+        <li>⏳ Waiting for payment confirmation…</li>
+      </ol>
+    </div>
+    <div class="hero-cta" style="margin-top:18px">
+      <button class="btn btn-primary btn-lg" id="downloadBtn" type="button" hidden>⬇ Download your ZIP</button>
+      <a class="btn btn-ghost" href="bundle.html">Back to product</a>
+    </div>
+    <p class="fine" id="emailNote" hidden>Your download link has also been sent to your email.</p>
+    <p class="fine">Order ID: <code id="orderLabel">—</code></p>
+  </div>
+</section>
+</main>
+<footer class="footer">
+  <div class="wrap foot-inner">
+    <div>
+      <strong>AI Projects Bundle</strong>
+      <p>10 practical AI projects for learning, experimenting, and building.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#how">How It Works</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="bundle.html">Get the Bundle</a>
+      <a href="contact.html">Contact</a>
+      <a href="refund.html">Refund Policy</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </nav>
+  </div>
+</footer>
+<script src="script.js?v=2"></script>
+<script src="assets/checkout.js?v=1"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var oid = params.get("oid") || "";
+  document.getElementById("orderLabel").textContent = oid || "—";
+  if (window.AIBundleCheckout) window.AIBundleCheckout.watchOrder(oid);
+})();
+</script>
+</body>
+</html>
