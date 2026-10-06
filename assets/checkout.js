@@ -123,6 +123,11 @@
       fetch("/api/payment-status?order_id=" + encodeURIComponent(oid), { cache: "no-store" })
         .then(function (r) { return r.json(); })
         .then(function (d) {
+          if (d.state === "UNKNOWN" && tries === 1) {
+            if (title) title.textContent = "Order not found";
+            setSteps(["We could not identify this order.", "Check the link, or contact support if you just paid."]);
+            return;
+          }
           if (d.state === "PAID") {
             if (title) title.textContent = "Payment confirmed 🎉";
             if (sub) sub.textContent = "Your AI Projects Bundle is ready.";
