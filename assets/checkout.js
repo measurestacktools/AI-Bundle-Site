@@ -38,7 +38,7 @@
       "<p class=\"buy-lead\">AI Projects Bundle · One-time payment</p>" +
       "<label class=\"field-label\" for=\"buyEmail\">Where should we send your download?</label>" +
       "<input class=\"field-input\" id=\"buyEmail\" type=\"email\" autocomplete=\"email\" placeholder=\"you@example.com\" />" +
-      "<label class=\"field-label\" for=\"buyPhone\">Mobile number <span class=\"fine\">(optional, helps UPI payments succeed)</span></label>" +
+      "<label class=\"field-label\" for=\"buyPhone\">Mobile number <span class=\"fine\">(10-digit, required by the payment gateway)</span></label>" +
       "<input class=\"field-input\" id=\"buyPhone\" type=\"tel\" autocomplete=\"tel\" inputmode=\"numeric\" placeholder=\"10-digit mobile\" />" +
       "<p class=\"fine\">Your download link will be sent to this email after payment is confirmed.</p>" +
       "<p class=\"field-error\" id=\"buyError\" hidden></p>" +
@@ -79,14 +79,12 @@
     }
     var payload = { email: email };
     var digits = ((phoneInput && phoneInput.value) || "").replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
-    if (digits !== "") {
-      if (!/^[6-9]\d{9}$/.test(digits)) {
-        showError("Enter a valid 10-digit mobile number or leave it blank.");
-        phoneInput.focus();
-        return;
-      }
-      payload.phone = digits;
+    if (!/^[6-9]\d{9}$/.test(digits)) {
+      showError("Enter a valid 10-digit mobile number — the payment gateway requires it.");
+      phoneInput.focus();
+      return;
     }
+    payload.phone = digits;
     btn.disabled = true;
     btn.textContent = "Starting payment…";
     fetch("/api/create-order", {

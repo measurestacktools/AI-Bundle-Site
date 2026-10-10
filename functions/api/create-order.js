@@ -17,12 +17,14 @@ export async function onRequestPost(context) {
     const body = await readJsonBody(request);
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     if (!isValidEmail(email)) return json({ ok: false, error: "Enter a valid email address" }, 400);
-    // Optional Indian mobile number (improves UPI success rates). Never required.
+    // Cashfree mandates customer_phone: required here, validated strictly.
+    // Email remains the purchase identifier; no account is created.
     let phone = "";
-    if (typeof body.phone === "string" && body.phone.trim() !== "") {
-      const digits = body.phone.replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
-      if (!/^[6-9]\d{9}$/.test(digits)) return json({ ok: false, error: "Enter a valid 10-digit mobile number or leave it blank" }, 400);
-      phone = digits;
+    if (typeof body.phone === "string") {
+      phone = body.phone.replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
+    }
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      return json({ ok: false, error: "Enter a valid 10-digit mobile number" }, 400);
     }
 
     const siteUrl = (env.SITE_URL || "https://aiprojectsbundle.pages.dev").replace(/\/$/, "");
