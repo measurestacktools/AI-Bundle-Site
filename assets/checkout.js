@@ -38,6 +38,8 @@
       "<p class=\"buy-lead\">AI Projects Bundle · One-time payment</p>" +
       "<label class=\"field-label\" for=\"buyEmail\">Where should we send your download?</label>" +
       "<input class=\"field-input\" id=\"buyEmail\" type=\"email\" autocomplete=\"email\" placeholder=\"you@example.com\" />" +
+      "<label class=\"field-label\" for=\"buyPhone\">Mobile number <span class=\"fine\">(optional, helps UPI payments succeed)</span></label>" +
+      "<input class=\"field-input\" id=\"buyPhone\" type=\"tel\" autocomplete=\"tel\" inputmode=\"numeric\" placeholder=\"10-digit mobile\" />" +
       "<p class=\"fine\">Your download link will be sent to this email after payment is confirmed.</p>" +
       "<p class=\"field-error\" id=\"buyError\" hidden></p>" +
       "<button class=\"btn btn-primary btn-lg\" id=\"continuePay\" type=\"button\">Continue to payment</button> " +
@@ -68,18 +70,29 @@
   function submitEmail() {
     var input = document.getElementById("buyEmail");
     var btn = document.getElementById("continuePay");
+    var phoneInput = document.getElementById("buyPhone");
     var email = (input.value || "").trim();
     if (!EMAIL_RE.test(email) || email.length > 254) {
       showError("Enter a valid email address.");
       input.focus();
       return;
     }
+    var payload = { email: email };
+    var digits = ((phoneInput && phoneInput.value) || "").replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
+    if (digits !== "") {
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        showError("Enter a valid 10-digit mobile number or leave it blank.");
+        phoneInput.focus();
+        return;
+      }
+      payload.phone = digits;
+    }
     btn.disabled = true;
     btn.textContent = "Starting payment…";
     fetch("/api/create-order", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: email }),
+      body: JSON.stringify(payload),
     })
       .then(function (r) { return r.json(); })
       .then(function (data) {

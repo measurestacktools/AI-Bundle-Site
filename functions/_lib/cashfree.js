@@ -32,15 +32,22 @@ async function parseOrThrow(res) {
   if (!res.ok) {
     const err = new Error("Cashfree request failed");
     err.status = 502;
-    // Never leak upstream body (may echo secrets); keep type/code only.
-    err.detail = data && data.type ? String(data.type).slice(0, 80) : `http_${res.status}`;
+    // Surface only the human message (never headers, keys, or full bodies).
+    const msg = data && typeof data.message === "string" ? data.message.replace(/\s+/g, " ").slice(0, 120) : "";
+    err.detail = msg ? `cf:${msg}` : `http_${res.status}`;
     throw err;
   }
   return data;
 }
 
 // POST /orders — creates a Cashfree order, returns {cf_order_id, order_id, payment_session_id, order_status}.
-export async function cfCreateOrder(env, { orderId, amount, currency, email, customerId, returnUrl, notifyUrl, note }) {
+export async function cfCreateOrder(env, { orderId, amount, currency, email, phone, customerId, returnUrl, notifyUrl, note }) {
+  const customer_details = {
+    customer_id: customerId,
+    customer_email: email,
+    customer_name: "Bundle Customer",
+  };
+  if (phone) customer_details.customer_phone = phone;
   const res = await fetch(`${baseUrl(env)}/orders`, {
     method: "POST",
     headers: headers(env, { "x-idempotency-key": orderId }),
@@ -48,11 +55,7 @@ export async function cfCreateOrder(env, { orderId, amount, currency, email, cus
       order_id: orderId,
       order_amount: amount,
       order_currency: currency,
-      customer_details: {
-        customer_id: customerId,
-        customer_email: email,
-        customer_name: "Bundle Customer",
-      },
+      customer_details,
       order_meta: { return_url: returnUrl, notify_url: notifyUrl },
       order_note: note || "AI Projects Bundle",
     }),

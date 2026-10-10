@@ -17,6 +17,13 @@ export async function onRequestPost(context) {
     const body = await readJsonBody(request);
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     if (!isValidEmail(email)) return json({ ok: false, error: "Enter a valid email address" }, 400);
+    // Optional Indian mobile number (improves UPI success rates). Never required.
+    let phone = "";
+    if (typeof body.phone === "string" && body.phone.trim() !== "") {
+      const digits = body.phone.replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
+      if (!/^[6-9]\d{9}$/.test(digits)) return json({ ok: false, error: "Enter a valid 10-digit mobile number or leave it blank" }, 400);
+      phone = digits;
+    }
 
     const siteUrl = (env.SITE_URL || "https://aiprojectsbundle.pages.dev").replace(/\/$/, "");
     const internalId = newOrderId();
@@ -32,6 +39,7 @@ export async function onRequestPost(context) {
         amount: PRODUCT.price,
         currency: PRODUCT.currency,
         email,
+        phone,
         customerId,
         returnUrl: `${siteUrl}/success.html?oid=${encodeURIComponent(internalId)}`.slice(0, 250),
         notifyUrl: `${siteUrl}/api/cashfree/webhook`.slice(0, 250),
@@ -39,7 +47,8 @@ export async function onRequestPost(context) {
       });
     } catch (e) {
       console.log(`[create-order] cashfree failed: ${e.detail || "unknown"}`);
-      return json({ ok: false, error: "Could not start payment, please try again" }, 502);
+      const hint = typeof e.detail === "string" && e.detail.startsWith("cf:") ? ` (${e.detail.slice(3, 120)})` : "";
+      return json({ ok: false, error: "Could not start payment, please try again" + hint }, 502);
     }
     if (!cf || !cf.payment_session_id || !cf.order_id) {
       return json({ ok: false, error: "Could not start payment, please try again" }, 502);
