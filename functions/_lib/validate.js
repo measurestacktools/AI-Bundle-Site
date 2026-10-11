@@ -2,7 +2,7 @@
 export const PRODUCT = Object.freeze({
   id: "ai-projects-bundle",
   name: "AI Projects Bundle",
-  price: 249,
+  price: 5, // TEMPORARY live-payment test price — revert to 249 immediately after
   currency: "INR",
 });
 
