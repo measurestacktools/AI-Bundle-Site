@@ -90,6 +90,8 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:22px;transition:transform .14s,box-shadow .14s;display:flex;flex-direction:column;box-shadow:var(--hard-sm)}
 .card:hover{transform:translate(-2px,-2px);box-shadow:var(--hard)}
+.card.featured{border-color:var(--signal);box-shadow:5px 5px 0 var(--signal)}
+.feat-badge{align-self:flex-start;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:1.4px;color:var(--signal-ink);background:var(--signal);border-radius:5px;padding:4px 9px;margin-bottom:10px}
 .tag{align-self:flex-start;font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--card);background:var(--green);border-radius:5px;padding:4px 9px;margin-bottom:12px}
 .card h3{margin:0 0 8px;font-size:19px;font-family:var(--serif)}
 .card p{margin:0 0 10px;color:var(--ink2);font-size:14px}
