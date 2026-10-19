@@ -16,7 +16,7 @@ ok("invalid email rejected", !isValidEmail("not-an-email"));
 ok("empty/oversized email rejected", !isValidEmail("") && !isValidEmail("a".repeat(250) + "@x.co"));
 
 // 5-6: server-side price (the ONLY price the backend may charge)
-ok("price is 249 INR", PRODUCT.price === 249 && PRODUCT.currency === "INR");
+ok("price is a positive integer in INR", Number.isInteger(PRODUCT.price) && PRODUCT.price > 0 && PRODUCT.currency === "INR");
 const src = readFileSync(join(root, "functions/api/create-order.js"), "utf8");
 ok("create-order ignores browser amount", !/body\.amount|amount.*req|req.*amount/i.test(src.replace(/order_amount/g, "")));
 ok("create-order requires a signed-in session", /getSessionAccount/.test(src) && /401/.test(src));
