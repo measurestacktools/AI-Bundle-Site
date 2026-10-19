@@ -13,6 +13,7 @@
   var pricing = { price: DEFAULT_PRICE, currency: DEFAULT_CURRENCY };
   var pricingPromise = null;
   var lastFocus = null;
+  var currentAccount = null;
 
   function toast(msg) {
     var t = document.createElement("div");
@@ -125,8 +126,7 @@
     Promise.all([getPricing(), window.AIBundleAuth.session()])
       .then(function (results) {
         var d = results[1] || {};
-        if (d.account) renderConfirm(d.account);
-        else renderSignIn();
+        route(d.account, d.orders);
       })
       .catch(function () {
         renderError("Something went wrong while loading checkout. Please try again.", true);
@@ -163,6 +163,63 @@
       '</div>';
   }
 
+  function accountBox(account) {
+    var email = (account && account.email) || "";
+    var initial = email ? email.charAt(0).toUpperCase() : "?";
+    return '<div class="info-box buy-account">' +
+      '<div class="buy-account-main">' +
+      '<span class="buy-avatar" aria-hidden="true">' + esc(initial) + '</span>' +
+      '<div>' +
+      '<span class="buy-label">Signed in as</span>' +
+      '<p class="buy-email">' + esc(email) + '</p>' +
+      '</div>' +
+      '</div>' +
+      '<button class="buy-link" id="switchAccount" type="button">Switch account</button>' +
+      '</div>';
+  }
+
+  function firstPaidOrder(orders) {
+    orders = Array.isArray(orders) ? orders : [];
+    for (var i = 0; i < orders.length; i++) {
+      if (orders[i] && orders[i].status === "PAID") return orders[i];
+    }
+    return null;
+  }
+
+  // Sends a signed-in customer to the right step: owners get their download,
+  // everyone else goes through confirm (or sign-in first).
+  function route(account, orders) {
+    currentAccount = account || null;
+    var paid = firstPaidOrder(orders);
+    if (account && paid) renderOwned(account, paid);
+    else if (account) renderConfirm(account);
+    else renderSignIn();
+  }
+
+  function renderOwned(account, order) {
+    var orderId = order && (order.order_id || order.id);
+    card().innerHTML =
+      head("You already own this bundle", "Purchased with this Google account") +
+      '<div class="buy-body">' +
+      accountBox(account) +
+      '<p class="buy-assure"><span class="buy-assure-mark" aria-hidden="true">✓</span>' +
+      '<span>No need to pay again — this account already has the AI Projects Bundle. ' +
+      'Download it here any time, or from your Orders page.</span></p>' +
+      '<div class="buy-actions">' +
+      '<button class="btn btn-primary btn-lg" id="ownedDownload" type="button">⬇ Download the bundle</button>' +
+      '<button class="btn btn-ghost" id="cancelBuy" type="button">Close</button>' +
+      '</div>' +
+      '</div>' +
+      foot();
+    bindCloseButtons();
+    document.getElementById("cancelBuy").addEventListener("click", closeModal);
+    document.getElementById("switchAccount").addEventListener("click", switchAccount);
+    var dl = document.getElementById("ownedDownload");
+    if (dl && orderId) dl.addEventListener("click", function () { startDownload(orderId, dl); });
+    else if (dl) dl.disabled = true;
+    focusCard();
+  }
+
   function renderLoading() {
     card().innerHTML =
       head("Preparing your checkout", "Checking your sign-in…") +
@@ -196,7 +253,8 @@
     var width = Math.max(200, Math.min(320, (window.innerWidth || 360) - 96));
     window.AIBundleAuth
       .signIn(slot, { button: { text: "signin_with", width: width } })
-      .then(function (account) { renderConfirm(account); })
+      .then(function () { return window.AIBundleAuth.session(); })
+      .then(function (d) { route(d && d.account, d && d.orders); })
       .catch(function (err) {
         var el = document.getElementById("buyError");
         if (el) { el.textContent = err.message || "Sign-in failed. Try again."; el.hidden = false; }
@@ -204,21 +262,10 @@
   }
 
   function renderConfirm(account) {
-    var email = (account && account.email) || "";
-    var initial = email ? email.charAt(0).toUpperCase() : "?";
     card().innerHTML =
       head("Confirm your order", "One-time payment · instant download") +
       '<div class="buy-body">' +
-      '<div class="info-box buy-account">' +
-      '<div class="buy-account-main">' +
-      '<span class="buy-avatar" aria-hidden="true">' + esc(initial) + '</span>' +
-      '<div>' +
-      '<span class="buy-label">Signed in as</span>' +
-      '<p class="buy-email">' + esc(email) + '</p>' +
-      '</div>' +
-      '</div>' +
-      '<button class="buy-link" id="switchAccount" type="button">Switch account</button>' +
-      '</div>' +
+      accountBox(account) +
       summary() +
       '<div class="buy-field">' +
       '<label class="field-label" for="phone">Mobile number</label>' +
@@ -361,6 +408,11 @@
           showPhoneError((res.body && res.body.error) || "Enter a valid 10-digit mobile number");
           resetPayButton(btn);
           if (input) input.focus();
+          return;
+        }
+        if (res.status === 409 && res.body && res.body.reason === "already_purchased") {
+          if (res.body.order_id) renderOwned(currentAccount, { order_id: res.body.order_id });
+          else showBuyError((res.body && res.body.error) || "You already own this bundle — download it from your Orders page.");
           return;
         }
         if (!res.body || res.body.ok !== true) throw new Error((res.body && res.body.error) || "Could not start payment");

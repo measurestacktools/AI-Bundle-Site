@@ -304,6 +304,25 @@ async function upsert(db) {
   );
 }
 
+// --- one purchase per account: owners cannot start another payment ----------
+{
+  const db = makeDb();
+  const accountId = await upsert(db);
+  const token = await createSession(db, accountId);
+  const cookie = "aib_session=" + token;
+  db.tables.orders["aib_owned_test"] = {
+    id: "aib_owned_test", email: "buyer@example.com", account_id: accountId,
+    product_id: "ai-projects-bundle", status: "PAID", paid_at: "2026-10-11T00:00:00.000Z",
+  };
+  cashfreeCalls.length = 0;
+  const r = await call(createOrder, "https://x/api/create-order", { method: "POST", body: { phone: "9876543210" }, cookie }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
+  ok(
+    "already-owned create-order -> 409 with order_id",
+    r.status === 409 && r.body.ok === false && r.body.reason === "already_purchased" && r.body.order_id === "aib_owned_test"
+  );
+  ok("already-owned does not call cashfree", cashfreeCalls.length === 0);
+}
+
 // --- phone normalization -----------------------------------------------------
 {
   ok("normalize +91 spaced phone", normalizePhone("+91 98765 43210") === "9876543210" && isValidPhone("+91 98765 43210"));

@@ -6,7 +6,7 @@ import { PRODUCT, json, errorToResponse, rateLimit, clientIp, normalizePhone, is
 import { newOrderId, sha256Hex } from "../_lib/crypto.js";
 import { createOrderRow } from "../_lib/db.js";
 import { cashfreeConfigured, cfCreateOrder } from "../_lib/cashfree.js";
-import { readSessionToken, getSessionAccount } from "../_lib/accounts.js";
+import { readSessionToken, getSessionAccount, findOrdersForAccount } from "../_lib/accounts.js";
 
 export async function onRequestPost(context) {
   try {
@@ -21,6 +21,22 @@ export async function onRequestPost(context) {
     if (!account) return json({ ok: false, error: "Sign in with Google to continue" }, 401);
     const email = String(account.email || "").trim().toLowerCase();
     if (!email) return json({ ok: false, error: "Sign in with Google to continue" }, 401);
+
+    // One purchase per account: if this account already owns the bundle, do not
+    // start another payment — point them at their existing download instead.
+    const owned = await findOrdersForAccount(env.DB, account.account_id, email, PRODUCT.id);
+    const alreadyPaid = owned.find((o) => o.status === "PAID");
+    if (alreadyPaid) {
+      return json(
+        {
+          ok: false,
+          reason: "already_purchased",
+          error: "You already own this bundle — download it from your Orders page.",
+          order_id: alreadyPaid.id,
+        },
+        409
+      );
+    }
 
     const body = await request.json().catch(() => ({}));
     const phone = normalizePhone(body && body.phone);
