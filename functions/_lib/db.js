@@ -4,10 +4,10 @@ export const nowIso = () => new Date().toISOString();
 export async function createOrderRow(db, row) {
   await db
     .prepare(
-      `INSERT INTO orders (id, cashfree_order_id, email, product_id, amount, currency, status, created_at, fulfillment_status, email_status)
-       VALUES (?, ?, ?, ?, ?, ?, 'CREATED', ?, 'NONE', 'PENDING')`
+      `INSERT INTO orders (id, cashfree_order_id, email, account_id, product_id, amount, currency, status, created_at, fulfillment_status, email_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'CREATED', ?, 'NONE', 'PENDING')`
     )
-    .bind(row.id, row.cashfreeOrderId, row.email, row.productId, row.amount, row.currency, nowIso())
+    .bind(row.id, row.cashfreeOrderId, row.email, row.accountId || null, row.productId, row.amount, row.currency, nowIso())
     .run();
 }
 

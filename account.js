@@ -1,11 +1,9 @@
-/* Account page: Google Sign-In (GIS) + session-backed purchases.
-   The ID token is posted to /api/auth/google, which verifies it against
-   Google's JWKS before creating a session cookie. The client never decides
-   whether a login is valid. */
+/* Orders page: Google Sign-In (shared helper) + automatic order tracking.
+   Every purchase is created under the signed-in account's email, so this page
+   lists orders straight from D1 — no order ID or email lookup needed. Pending
+   orders refresh themselves until Cashfree's webhook marks them PAID. */
 (function () {
   "use strict";
-
-  var GOOGLE_CLIENT_ID = "";
 
   var loading = document.getElementById("loading");
   var signedOut = document.getElementById("signedOut");
@@ -13,8 +11,8 @@
   var authError = document.getElementById("authError");
   var orderList = document.getElementById("orderList");
   var gsiSlot = document.getElementById("gsiButton");
-  var gsiLoaded = false;
   var state = { account: null, orders: [] };
+  var pollTimer = null;
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -23,105 +21,63 @@
   }
   function show(el, on) { if (el) el.hidden = !on; }
   function err(msg) {
+    if (!authError) return;
     if (!msg) { show(authError, false); return; }
     authError.textContent = msg;
     show(authError, true);
   }
 
-  function loadGsi() {
-    if (gsiLoaded) return;
-    gsiLoaded = true;
-    var s = document.createElement("script");
-    s.src = "https://accounts.google.com/gsi/client";
-    s.async = true;
-    s.defer = true;
-    s.onload = initGsi;
-    s.onerror = function () {
-      err("Google Sign-In could not load. Check your connection and refresh.");
-    };
-    document.head.appendChild(s);
-  }
-
-  function initGsi() {
-    if (!window.google || !google.accounts || !google.accounts.id) {
-      return err("Google Sign-In is unavailable in this browser.");
-    }
-    if (!GOOGLE_CLIENT_ID) {
-      gsiSlot.innerHTML =
-        '<p class="fine"><strong>Google sign-in is not configured yet.</strong> ' +
-        'Add <code>GOOGLE_CLIENT_ID</code> as a Cloudflare Pages environment variable, ' +
-        'then redeploy. Until then use <a href="purchases.html">My Purchases</a>.</p>';
-      return;
-    }
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: onCredential,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-      use_fedcm_for_prompt: true,
-    });
-    google.accounts.id.renderButton(gsiSlot, {
-      type: "standard",
-      theme: "outline",
-      size: "large",
-      text: "signin_with",
-      shape: "rectangular",
-      logo_alignment: "left",
-      width: 280,
-    });
-  }
-
-  function onCredential(res) {
-    if (!res || !res.credential) return err("Sign-in was cancelled.");
-    err("");
-    fetch("/api/auth/google", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ credential: res.credential }),
-    })
-      .then(function (r) { return r.json().catch(function () { return {}; }); })
-      .then(function (d) {
-        if (!d || d.ok !== true || !d.account) {
-          err((d && d.error) || "Sign-in could not be verified. Try again.");
-          return;
-        }
-        return refresh();
-      })
-      .catch(function () { err("Could not reach the server. Check your connection and retry."); });
-  }
-
   function refresh() {
-    return fetch("/api/auth/session", { cache: "no-store" })
-      .then(function (r) { return r.json().catch(function () { return {}; }); })
-      .then(function (d) {
-        show(loading, false);
-        state.account = (d && d.account) || null;
-        state.orders = (d && Array.isArray(d.orders)) ? d.orders : [];
-        if (!state.account) {
-          show(signedIn, false);
-          show(signedOut, true);
-          loadGsi();
-          return;
-        }
-        show(signedOut, false);
-        show(signedIn, true);
-        renderAccount();
-        renderOrders();
-      })
-      .catch(function () {
-        show(loading, false);
+    return window.AIBundleAuth.session().then(function (d) {
+      show(loading, false);
+      state.account = d.account || null;
+      state.orders = Array.isArray(d.orders) ? d.orders : [];
+      if (!state.account) {
+        state.orders = [];
+        show(signedIn, false);
         show(signedOut, true);
-        err("Could not check your session. Refresh to try again.");
-        loadGsi();
+        renderSignIn();
+        return;
+      }
+      show(signedOut, false);
+      show(signedIn, true);
+      renderAccount();
+      renderOrders();
+    });
+  }
+
+  function renderSignIn() {
+    if (!gsiSlot || gsiSlot.getAttribute("data-ready") === "1") return;
+    gsiSlot.setAttribute("data-ready", "1");
+    err("");
+    window.AIBundleAuth
+      .signIn(gsiSlot)
+      .then(function () { return refresh(); })
+      .catch(function (e) {
+        gsiSlot.setAttribute("data-ready", "0");
+        gsiSlot.innerHTML = "";
+        err(e.message || "Sign-in failed. Try again.");
+        renderSignIn();
       });
   }
 
   function renderAccount() {
     var a = state.account;
-    document.getElementById("accName").textContent = a.name || "Signed in";
-    document.getElementById("accEmail").textContent = a.email;
+    var nameEl = document.getElementById("accName");
+    var emailEl = document.getElementById("accEmail");
+    if (nameEl) nameEl.textContent = a.name || "Signed in";
+    if (emailEl) emailEl.textContent = a.email;
     var img = document.getElementById("avatar");
-    if (a.picture) { img.src = a.picture; img.alt = ""; show(img, true); }
+    if (img) {
+      if (a.picture) { img.src = a.picture; img.alt = ""; show(img, true); }
+      else { show(img, false); }
+    }
+  }
+
+  function statusLabel(o) {
+    if (o.status === "PAID") return "Paid";
+    if (o.status === "PAYMENT_FAILED" || o.status === "CANCELLED") return "Payment failed";
+    return "Payment pending";
   }
 
   function renderOrders() {
@@ -129,38 +85,67 @@
     if (!state.orders.length) {
       var li = document.createElement("li");
       li.innerHTML =
-        "No paid purchases found for <strong>" + esc(state.account.email) + "</strong>. " +
-        'If you paid with a different email, use <a href="purchases.html">My Purchases</a> with that address.';
+        "No orders yet for <strong>" + esc(state.account.email) + "</strong>. " +
+        'Your purchases appear here automatically after checkout — <a href="bundle.html">get the bundle</a>.';
       orderList.appendChild(li);
       return;
     }
     state.orders.forEach(function (o) {
       var li = document.createElement("li");
       var title = document.createElement("div");
+      var when = o.paid_at || o.created_at;
+      var date = when ? " · " + esc(String(when).slice(0, 10)) : "";
       title.innerHTML =
-        "<strong>AI Projects Bundle</strong> — paid" +
-        (o.paid_at ? " on " + esc(String(o.paid_at).slice(0, 10)) : "") +
-        " · free forever";
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "btn btn-primary";
-      btn.style.marginTop = "10px";
-      btn.textContent = "⬇ Download — Free";
-      btn.addEventListener("click", function () { download(o.order_id, btn, li); });
-      var note = document.createElement("div");
-      note.className = "fine";
+        "<strong>AI Projects Bundle</strong> · ₹249 — <strong>" + esc(statusLabel(o)) + "</strong>" + date;
       li.appendChild(title);
-      li.appendChild(btn);
-      li.appendChild(note);
+
+      if (o.status === "PAID") {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-primary";
+        btn.style.marginTop = "10px";
+        btn.textContent = "⬇ Download — Free";
+        btn.addEventListener("click", function () { download(o.order_id, btn, li); });
+        var note = document.createElement("div");
+        note.className = "fine";
+        li.appendChild(btn);
+        li.appendChild(note);
+      } else if (o.status === "PAYMENT_FAILED" || o.status === "CANCELLED") {
+        var retry = document.createElement("p");
+        retry.className = "fine";
+        retry.innerHTML = 'Payment did not go through — <a href="bundle.html">try the purchase again</a>.';
+        li.appendChild(retry);
+      } else {
+        var pending = document.createElement("p");
+        pending.className = "fine";
+        pending.innerHTML =
+          "Waiting for the payment gateway to confirm. This page updates itself " +
+          '— you can also <a href="bundle.html">start a fresh checkout</a>.';
+        li.appendChild(pending);
+      }
       orderList.appendChild(li);
     });
+    schedulePoll();
+  }
+
+  function schedulePoll() {
+    if (pollTimer) clearTimeout(pollTimer);
+    pollTimer = null;
+    var pending = state.orders.some(function (o) {
+      return o.status !== "PAID" && o.status !== "PAYMENT_FAILED" && o.status !== "CANCELLED";
+    });
+    if (!pending) return;
+    pollTimer = setTimeout(function () {
+      if (document.hidden) return schedulePoll();
+      refresh();
+    }, 5000);
   }
 
   function download(orderId, btn, li) {
     var note = li.querySelector(".fine");
     btn.disabled = true;
     btn.textContent = "Preparing link…";
-    note.textContent = "";
+    if (note) note.textContent = "";
     fetch("/api/account/download", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -183,29 +168,31 @@
         setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
         btn.disabled = false;
         btn.textContent = "⬇ Download — Free";
-        note.textContent = "✓ Downloaded. That link is spent — press again anytime for a fresh one.";
+        if (note) note.textContent = "✓ Downloaded. That link is spent — press again anytime for a fresh one.";
       })
       .catch(function () {
         btn.disabled = false;
         btn.textContent = "⬇ Download — Free";
-        note.textContent = "⚠ Could not prepare the download. Refresh and try again.";
+        if (note) note.textContent = "⚠ Could not prepare the download. Refresh and try again.";
       });
   }
 
   document.getElementById("logoutBtn").addEventListener("click", function () {
-    fetch("/api/auth/logout", { method: "POST" })
-      .catch(function () {})
-      .then(function () { return refresh(); });
+    window.AIBundleAuth.logout().then(function () {
+      gsiSlot.setAttribute("data-ready", "0");
+      gsiSlot.innerHTML = "";
+      return refresh();
+    });
   });
 
   function boot() {
-    fetch("/api/auth/config", { cache: "no-store" })
-      .then(function (r) { return r.json().catch(function () { return {}; }); })
-      .then(function (d) {
-        GOOGLE_CLIENT_ID = (d && d.google_client_id) || "";
-      })
-      .catch(function () { GOOGLE_CLIENT_ID = ""; })
-      .then(refresh);
+    if (!window.AIBundleAuth) {
+      show(loading, false);
+      show(signedOut, true);
+      err("Sign-in could not load. Refresh the page and try again.");
+      return;
+    }
+    refresh();
   }
 
   boot();

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>My Account | AI Projects Bundle</title>
-<meta name="description" content="Sign in with Google to access your AI Projects Bundle purchases and download your ZIP again any time." />
+<title>Orders | AI Projects Bundle</title>
+<meta name="description" content="Sign in with Google to see every AI Projects Bundle purchase and download your ZIP again any time." />
 <meta name="robots" content="noindex" />
 <link rel="icon" href="/favicon.ico?v=3" sizes="any" />
 <link rel="icon" href="/assets/favicon.svg?v=3" type="image/svg+xml" />
@@ -22,8 +22,7 @@
       <a href="index.html#how">How it works</a>
       <a href="index.html#pricing">Pricing</a>
       <a href="index.html#faq">FAQ</a>
-      <a href="track-order.html">Track Order</a>
-      <a href="account.html" aria-current="page">My Account</a>
+      <a href="account.html" aria-current="page">Orders</a>
     </nav>
     <div class="nav-cta">
       <a class="btn btn-primary btn-sm" href="bundle.html" data-cta>Get the Bundle</a>
@@ -34,21 +33,21 @@
 <main id="main">
 <section class="section">
   <div class="wrap narrow">
-    <p class="pill">◈ My Account</p>
+    <p class="pill">◈ Orders</p>
     <h1 class="page-title">Your bundle, whenever you need it</h1>
-    <p class="section-sub">Sign in with Google using the same email you paid with. Your purchases and fresh download links appear here — no codes, no repeat payment.</p>
+    <p class="section-sub">Sign in with Google using the email you bought with. Every purchase is saved to your account automatically — download it again here, any time, without paying twice.</p>
 
     <div id="loading" class="info-box"><p class="fine">Checking your session…</p></div>
 
     <!-- SIGNED OUT -->
     <div id="signedOut" hidden>
       <div class="info-box">
-        <h2>Sign in</h2>
-        <p class="fine" id="signInHelp">Use the Google account whose email matches your purchase. First time here? Signing in creates your account automatically — no separate sign-up form.</p>
+        <h2>Sign in with Google</h2>
+        <p class="fine" id="signInHelp">First time here? Signing in creates your account automatically — no separate sign-up form. If you already bought the bundle, use the same Google email you paid with.</p>
         <div id="gsiButton" style="margin-top:14px"></div>
         <p class="field-error" id="authError" role="alert" hidden></p>
         <noscript><p class="fine">Google sign-in needs JavaScript enabled.</p></noscript>
-        <p class="fine" style="margin-top:16px">No Google account? You can still recover a purchase with an email code on the <a href="purchases.html">My Purchases</a> page.</p>
+        <p class="fine" style="margin-top:16px">Don't have it yet? <a href="bundle.html">Get the bundle</a> — you'll be asked to sign in before paying.</p>
       </div>
     </div>
 
@@ -65,11 +64,11 @@
         </div>
       </div>
 
-      <h2>Your purchases</h2>
+      <h2>Your orders</h2>
       <div class="info-box">
         <ol class="key-steps" id="orderList" aria-live="polite"></ol>
       </div>
-      <p class="fine" style="margin-top:14px">Each download uses a fresh single-use link that expires in 10 minutes. If an order is missing, make sure your Google email matches the checkout email — otherwise use <a href="purchases.html">My Purchases</a>.</p>
+      <p class="fine" style="margin-top:14px">Pending payments update automatically as soon as the payment gateway confirms them. Each download uses a fresh single-use link that expires in 10 minutes.</p>
     </div>
   </div>
 </section>
@@ -85,9 +84,7 @@
       <a href="index.html#how">How It Works</a>
       <a href="index.html#faq">FAQ</a>
       <a href="bundle.html">Get the Bundle</a>
-      <a href="track-order.html">Track Order</a>
-      <a href="account.html">My Account</a>
-      <a href="purchases.html">My Purchases</a>
+      <a href="account.html">Orders</a>
       <a href="contact.html">Contact</a>
       <a href="refund.html">Refund Policy</a>
       <a href="privacy.html">Privacy Policy</a>
@@ -95,6 +92,7 @@
   </div>
 </footer>
 <script src="script.js?v=2"></script>
-<script src="account.js?v=1"></script>
+<script src="assets/auth.js?v=1"></script>
+<script src="account.js?v=2"></script>
 </body>
 </html>

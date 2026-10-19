@@ -5,6 +5,7 @@ import { onRequestPost as googleLogin } from "../functions/api/auth/google.js";
 import { onRequestPost as logout } from "../functions/api/auth/logout.js";
 import { onRequestGet as session } from "../functions/api/auth/session.js";
 import { onRequestPost as accountDownload } from "../functions/api/account/download.js";
+import { onRequestPost as createOrder } from "../functions/api/create-order.js";
 import {
   verifyGoogleIdToken,
   createSession,
@@ -53,14 +54,25 @@ async function makeToken(overrides = {}, { badKey = false } = {}) {
   return signingInput + "." + b64u(sig);
 }
 
-// --- fetch stub: Google JWKS only -------------------------------------------
+// --- fetch stub: Google JWKS + Cashfree create-order -------------------------
 const realFetch = globalThis.fetch;
-globalThis.fetch = async (url) => {
+const cashfreeCalls = [];
+globalThis.fetch = async (url, opts = {}) => {
   if (String(url).includes("googleapis.com/oauth2/v3/certs")) {
     return {
       ok: true,
       async json() {
         return { keys: [{ ...pubJwk, kid: KID, alg: "RS256", use: "sig" }] };
+      },
+    };
+  }
+  if (String(url).includes("cashfree.com/pg/orders")) {
+    cashfreeCalls.push(JSON.parse(opts.body || "{}"));
+    return {
+      ok: true,
+      status: 200,
+      async text() {
+        return JSON.stringify({ order_id: "cf_test_order", cf_order_id: 123456, payment_session_id: "session_test_123" });
       },
     };
   }
@@ -97,10 +109,10 @@ function makeDb(seedOrders = {}) {
           throw new Error("mock: unhandled first(): " + q);
         },
         async all() {
-          if (q.includes("FROM orders WHERE email = ?"))
+          if (q.includes("FROM orders WHERE product_id = ? AND (account_id = ? OR email = ?)"))
             return {
               results: Object.values(t.orders).filter(
-                (o) => o.email === args[0] && o.product_id === args[1] && o.status === "PAID"
+                (o) => o.product_id === args[0] && ((o.account_id && o.account_id === args[1]) || o.email === args[2])
               ),
             };
           throw new Error("mock: unhandled all(): " + q);
@@ -136,6 +148,14 @@ function makeDb(seedOrders = {}) {
             t.download_tokens.push({ token_hash: args[0], order_id: args[1], expires_at: args[2], used: 0 });
             return { meta: { changes: 1 } };
           }
+          if (q.startsWith("INSERT INTO orders")) {
+            t.orders[args[0]] = {
+              id: args[0], cashfree_order_id: args[1], email: args[2], account_id: args[3],
+              product_id: args[4], amount: args[5], currency: args[6], status: "CREATED",
+              created_at: args[7], paid_at: null,
+            };
+            return { meta: { changes: 1 } };
+          }
           throw new Error("mock: unhandled run(): " + q);
         },
       };
@@ -147,6 +167,7 @@ const PAID = { id: "aib_paid_acct_test", email: "buyer@example.com", product_id:
 const PENDING = { id: "aib_pend_acct_test", email: "buyer@example.com", product_id: "ai-projects-bundle", status: "CREATED", paid_at: null };
 const OTHER = { id: "aib_other_acct_test", email: "stranger@example.com", product_id: "ai-projects-bundle", status: "PAID", paid_at: "2026-10-11T00:00:00.000Z" };
 const ENV = { DB: null, GOOGLE_CLIENT_ID: CLIENT_ID };
+const CF_ENV = { CASHFREE_APP_ID: "test_app", CASHFREE_SECRET_KEY: "test_secret", CASHFREE_ENVIRONMENT: "sandbox", SITE_URL: "https://example.test" };
 
 let ipN = 500;
 function req(url, { method = "GET", body, cookie, headers = {} } = {}) {
@@ -217,7 +238,20 @@ async function upsert(db) {
   const cookie = "aib_session=" + token;
 
   let r = await call(session, "https://x/api/auth/session", { cookie }, { DB: db, GOOGLE_CLIENT_ID: CLIENT_ID });
-  ok("session lists account + only own PAID order", r.status === 200 && r.body.account.email === "buyer@example.com" && r.body.orders.length === 1 && r.body.orders[0].order_id === PAID.id);
+  const ids = r.body.orders.map((o) => o.order_id);
+  ok(
+    "session lists own orders (paid + pending), never others",
+    r.status === 200 &&
+      r.body.account.email === "buyer@example.com" &&
+      r.body.orders.length === 2 &&
+      ids.includes(PAID.id) &&
+      ids.includes(PENDING.id) &&
+      !ids.includes(OTHER.id)
+  );
+  ok(
+    "orders carry a status for automatic tracking",
+    r.body.orders.some((o) => o.status === "PAID") && r.body.orders.some((o) => o.status === "CREATED")
+  );
 
   r = await call(session, "https://x/api/auth/session", {}, { DB: db, GOOGLE_CLIENT_ID: CLIENT_ID });
   ok("signed out returns account null (not 401)", r.status === 200 && r.body.account === null);
@@ -236,6 +270,31 @@ async function upsert(db) {
 
   r = await call(logout, "https://x/api/auth/logout", { method: "POST", cookie }, { DB: db });
   ok("logout clears cookie + session", r.status === 200 && /Max-Age=0/.test(r.cookie) && db.tables.sessions.length === 0);
+}
+
+// --- /api/create-order (sign-in gated) ---------------------------------------
+{
+  const db = makeDb();
+  const accountId = await upsert(db);
+  const token = await createSession(db, accountId);
+  const cookie = "aib_session=" + token;
+
+  cashfreeCalls.length = 0;
+  let r = await call(createOrder, "https://x/api/create-order", { method: "POST" }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
+  ok("create-order without session -> 401", r.status === 401 && cashfreeCalls.length === 0);
+
+  r = await call(createOrder, "https://x/api/create-order", { method: "POST", cookie }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
+  ok("signed-in create-order -> payment session", r.status === 200 && r.body.ok === true && r.body.payment_session_id === "session_test_123");
+
+  const sent = cashfreeCalls[0];
+  ok("cashfree gets the session email", Boolean(sent) && sent.customer_details.customer_email === "buyer@example.com");
+  ok("cashfree gets a dummy phone (customers are never asked)", Boolean(sent) && sent.customer_details.customer_phone === "9999999999");
+
+  const row = Object.values(db.tables.orders)[0];
+  ok(
+    "order stores account_id + session email",
+    Boolean(row) && row.account_id === accountId && row.email === "buyer@example.com" && row.status === "CREATED"
+  );
 }
 
 // --- no self-asserted identity ----------------------------------------------

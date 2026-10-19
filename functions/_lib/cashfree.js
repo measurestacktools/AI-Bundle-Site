@@ -41,11 +41,11 @@ async function parseOrThrow(res) {
 }
 
 // POST /orders — creates a Cashfree order, returns {cf_order_id, order_id, payment_session_id, order_status}.
-export async function cfCreateOrder(env, { orderId, amount, currency, email, phone, customerId, returnUrl, notifyUrl, note }) {
+export async function cfCreateOrder(env, { orderId, amount, currency, email, phone, customerId, customerName, returnUrl, notifyUrl, note }) {
   const customer_details = {
     customer_id: customerId,
     customer_email: email,
-    customer_name: "Bundle Customer",
+    customer_name: customerName || "Bundle Customer",
   };
   if (phone) customer_details.customer_phone = phone;
   const res = await fetch(`${baseUrl(env)}/orders`, {

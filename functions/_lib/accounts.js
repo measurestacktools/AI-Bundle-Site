@@ -200,14 +200,22 @@ export async function deleteSession(db, token) {
   await db.prepare(`DELETE FROM sessions WHERE token_hash = ?`).bind(await sha256Hex(token)).run();
 }
 
-export async function findOrdersForAccount(db, email, productId) {
+// Every order created after sign-in carries account_id; email matching keeps
+// older rows visible to the buyer who used the same address.
+export async function findOrdersForAccount(db, accountId, email, productId) {
   const res = await db
     .prepare(
-      `SELECT id, product_id, status, paid_at FROM orders
-       WHERE email = ? AND product_id = ? AND status = 'PAID'
-       ORDER BY paid_at DESC LIMIT 20`
+      `SELECT id, product_id, status, paid_at, created_at FROM orders
+       WHERE product_id = ? AND (account_id = ? OR email = ?)
+       ORDER BY created_at DESC LIMIT 20`
     )
-    .bind(email, productId)
+    .bind(productId, accountId, email)
     .all();
   return res?.results || [];
+}
+
+export function orderBelongsToAccount(order, account) {
+  if (!order || !account) return false;
+  if (order.account_id && order.account_id === account.account_id) return true;
+  return String(order.email || "").trim().toLowerCase() === account.email;
 }

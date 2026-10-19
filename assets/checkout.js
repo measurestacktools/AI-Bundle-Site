@@ -1,10 +1,11 @@
 /* AI Projects Bundle — checkout flow (no secrets here; price comes from the server).
-   Buy Now -> email modal -> POST /api/create-order -> cashfree.js checkout ->
-   return to success.html -> poll /api/payment-status -> paid download. */
+   Buy Now -> Google sign-in (session cookie) -> POST /api/create-order ->
+   cashfree.js checkout -> return to success.html -> poll /api/payment-status.
+   There is deliberately no email or phone form: the order email is taken from
+   the verified session, and Cashfree gets a dummy phone from the server. */
 (function () {
   "use strict";
 
-  var EMAIL_RE = /^[^\s@<>(),;:\\"[\]]+@[^\s@<>(),;:\\"[\]]+\.[^\s@<>(),;:\\"[\]]{2,}$/;
   var SDK_URL = "https://sdk.cashfree.com/js/v3/cashfree.js";
 
   function toast(msg) {
@@ -14,6 +15,12 @@
     t.style.cssText = "position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#fffdf4;color:#211a10;border:2px solid #211a10;border-radius:10px;padding:12px 18px;font-size:14px;z-index:99;box-shadow:3px 3px 0 #211a10;max-width:90vw";
     document.body.appendChild(t);
     setTimeout(function () { t.remove(); }, 3200);
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
   }
 
   function loadSdk() {
@@ -27,32 +34,20 @@
     });
   }
 
-  function openModal() {
-    closeModal();
-    var ov = document.createElement("div");
+  function overlay() {
+    var ov = document.getElementById("buyModal");
+    if (ov) return ov;
+    ov = document.createElement("div");
     ov.className = "modal-overlay";
     ov.id = "buyModal";
-    ov.innerHTML =
-      '<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="buyTitle">' +
-      "<h2 id=\"buyTitle\">Get the Bundle — ₹249</h2>" +
-      "<p class=\"buy-lead\">AI Projects Bundle · One-time payment</p>" +
-      "<label class=\"field-label\" for=\"buyEmail\">Where should we send your download?</label>" +
-      "<input class=\"field-input\" id=\"buyEmail\" type=\"email\" autocomplete=\"email\" placeholder=\"you@example.com\" />" +
-      "<label class=\"field-label\" for=\"buyPhone\">Mobile number <span class=\"fine\">(10-digit, required by the payment gateway)</span></label>" +
-      "<input class=\"field-input\" id=\"buyPhone\" type=\"tel\" autocomplete=\"tel\" inputmode=\"numeric\" placeholder=\"10-digit mobile\" />" +
-      "<p class=\"fine\">Your download link will be sent to this email after payment is confirmed.</p>" +
-      "<p class=\"field-error\" id=\"buyError\" hidden></p>" +
-      "<button class=\"btn btn-primary btn-lg\" id=\"continuePay\" type=\"button\">Continue to payment</button> " +
-      "<button class=\"btn btn-ghost\" id=\"cancelBuy\" type=\"button\">Cancel</button>" +
-      "<p class=\"fine\">Secure payment powered by Cashfree</p>" +
-      "</div>";
-    document.body.appendChild(ov);
-    document.getElementById("cancelBuy").addEventListener("click", closeModal);
+    ov.innerHTML = '<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="buyTitle"></div>';
     ov.addEventListener("click", function (e) { if (e.target === ov) closeModal(); });
-    document.getElementById("continuePay").addEventListener("click", submitEmail);
-    var input = document.getElementById("buyEmail");
-    input.focus();
-    input.addEventListener("keydown", function (e) { if (e.key === "Enter") submitEmail(); });
+    document.body.appendChild(ov);
+    return ov;
+  }
+
+  function card() {
+    return overlay().querySelector(".modal-card");
   }
 
   function closeModal() {
@@ -60,50 +55,108 @@
     if (ov) ov.remove();
   }
 
-  function showError(msg) {
+  function openCheckout() {
+    closeModal();
+    overlay();
+    renderLoading();
+    if (!window.AIBundleAuth) {
+      return renderError("Sign-in could not load. Refresh the page and try again.", true);
+    }
+    window.AIBundleAuth.session().then(function (d) {
+      if (d.account) renderConfirm(d.account);
+      else renderSignIn();
+    });
+  }
+
+  function renderLoading() {
+    card().innerHTML =
+      '<h2 id="buyTitle">Get the Bundle — ₹249</h2>' +
+      '<p class="buy-lead">AI Projects Bundle · One-time payment</p>' +
+      '<p class="fine">Checking your sign-in…</p>';
+  }
+
+  function renderSignIn() {
+    card().innerHTML =
+      '<h2 id="buyTitle">Sign in to buy</h2>' +
+      '<p class="buy-lead">AI Projects Bundle · One-time payment · ₹249</p>' +
+      '<p class="fine">Sign in with Google using the email you want to buy with. ' +
+      "Your order is saved to this account, so you can download it again from <strong>Orders</strong> anytime.</p>" +
+      '<div id="checkoutGsi" style="margin-top:16px"></div>' +
+      '<p class="field-error" id="buyError" role="alert" hidden></p>' +
+      '<button class="btn btn-ghost" id="cancelBuy" type="button">Cancel</button>' +
+      '<p class="fine">Secure payment powered by Cashfree</p>';
+    document.getElementById("cancelBuy").addEventListener("click", closeModal);
+    var slot = document.getElementById("checkoutGsi");
+    window.AIBundleAuth
+      .signIn(slot, { button: { text: "signin_with" } })
+      .then(function (account) { renderConfirm(account); })
+      .catch(function (err) {
+        var el = document.getElementById("buyError");
+        if (el) { el.textContent = err.message || "Sign-in failed. Try again."; el.hidden = false; }
+      });
+  }
+
+  function renderConfirm(account) {
+    card().innerHTML =
+      '<h2 id="buyTitle">Get the Bundle — ₹249</h2>' +
+      '<p class="buy-lead">AI Projects Bundle · One-time payment</p>' +
+      '<div class="info-box" style="margin-top:14px">' +
+      '<p class="fine" style="margin:0">Signed in as</p>' +
+      "<p style=\"margin:4px 0 0\"><strong>" + esc(account.email) + "</strong></p>" +
+      '<p class="fine" style="margin:8px 0 0">Your purchase is linked to this account. ' +
+      "After payment you can download it from <strong>Orders</strong> whenever you need it.</p>" +
+      "</div>" +
+      '<p class="field-error" id="buyError" role="alert" hidden></p>' +
+      '<button class="btn btn-primary btn-lg" id="continuePay" type="button">Pay ₹249</button>' +
+      '<button class="btn btn-ghost" id="cancelBuy" type="button">Cancel</button>' +
+      '<p class="fine">Secure payment powered by Cashfree</p>';
+    document.getElementById("cancelBuy").addEventListener("click", closeModal);
+    document.getElementById("continuePay").addEventListener("click", startPayment);
+  }
+
+  function renderError(message, retry) {
+    if (!document.getElementById("buyModal")) overlay();
+    card().innerHTML =
+      '<h2 id="buyTitle">Checkout unavailable</h2>' +
+      '<p class="field-error" role="alert">' + esc(message) + "</p>" +
+      '<button class="btn btn-primary" id="retryBuy" type="button">Try again</button>' +
+      '<button class="btn btn-ghost" id="cancelBuy" type="button">Close</button>';
+    document.getElementById("cancelBuy").addEventListener("click", closeModal);
+    if (retry) document.getElementById("retryBuy").addEventListener("click", openCheckout);
+  }
+
+  function showBuyError(msg) {
     var el = document.getElementById("buyError");
     if (!el) return toast(msg);
     el.textContent = msg;
     el.hidden = false;
   }
 
-  function submitEmail() {
-    var input = document.getElementById("buyEmail");
+  function startPayment() {
     var btn = document.getElementById("continuePay");
-    var phoneInput = document.getElementById("buyPhone");
-    var email = (input.value || "").trim();
-    if (!EMAIL_RE.test(email) || email.length > 254) {
-      showError("Enter a valid email address.");
-      input.focus();
-      return;
-    }
-    var payload = { email: email };
-    var digits = ((phoneInput && phoneInput.value) || "").replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
-    if (!/^[6-9]\d{9}$/.test(digits)) {
-      showError("Enter a valid 10-digit mobile number — the payment gateway requires it.");
-      phoneInput.focus();
-      return;
-    }
-    payload.phone = digits;
     btn.disabled = true;
     btn.textContent = "Starting payment…";
-    fetch("/api/create-order", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data.ok) throw new Error(data.error || "Could not start payment");
+    fetch("/api/create-order", { method: "POST" })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) {
+          return { status: r.status, body: d };
+        });
+      })
+      .then(function (res) {
+        if (res.status === 401) {
+          renderSignIn();
+          return;
+        }
+        if (!res.body || res.body.ok !== true) throw new Error((res.body && res.body.error) || "Could not start payment");
         return loadSdk().then(function () {
-          var cf = window.Cashfree({ mode: data.mode === "production" ? "production" : "sandbox" });
-          cf.checkout({ paymentSessionId: data.payment_session_id, redirectTarget: "_self" });
+          var cf = window.Cashfree({ mode: res.body.mode === "production" ? "production" : "sandbox" });
+          cf.checkout({ paymentSessionId: res.body.payment_session_id, redirectTarget: "_self" });
         });
       })
       .catch(function (err) {
         btn.disabled = false;
-        btn.textContent = "Continue to payment";
-        showError(err.message || "Could not start payment, please try again.");
+        btn.textContent = "Pay ₹249";
+        showBuyError(err.message || "Could not start payment, please try again.");
       });
   }
 
@@ -141,7 +194,7 @@
           }
           if (d.state === "PAID") {
             if (title) title.textContent = "Payment confirmed 🎉";
-            if (sub) sub.textContent = "Your AI Projects Bundle is ready.";
+            if (sub) sub.textContent = "Your AI Projects Bundle is ready. It is also saved under Orders.";
             setSteps(["✓ Payment confirmed", "✓ Order created", "✓ Download ready", d.email_sent ? "✓ Email sent" : "✓ Download below (email pending)"]);
             if (dl) {
               dl.hidden = false;
@@ -193,5 +246,5 @@
       });
   }
 
-  window.AIBundleCheckout = { openModal: openModal, closeModal: closeModal, watchOrder: watchOrder };
+  window.AIBundleCheckout = { openCheckout: openCheckout, openModal: openCheckout, closeModal: closeModal, watchOrder: watchOrder };
 })();

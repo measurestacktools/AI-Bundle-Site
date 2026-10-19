@@ -19,6 +19,12 @@ ok("empty/oversized email rejected", !isValidEmail("") && !isValidEmail("a".repe
 ok("price is 249 INR", PRODUCT.price === 249 && PRODUCT.currency === "INR");
 const src = readFileSync(join(root, "functions/api/create-order.js"), "utf8");
 ok("create-order ignores browser amount", !/body\.amount|amount.*req|req.*amount/i.test(src.replace(/order_amount/g, "")));
+ok("create-order requires a signed-in session", /getSessionAccount/.test(src) && /401/.test(src));
+ok("create-order takes the email from the session, never the browser", !/body\.email/.test(src));
+{
+  const cf = readFileSync(join(root, "functions/_lib/cashfree.js"), "utf8");
+  ok("no mobile number collected; server sends a dummy phone", /DUMMY_PHONE/.test(src) && /customer_phone/.test(cf));
+}
 
 // order id format (Cashfree: 3-45 chars, [A-Za-z0-9_-])
 for (let i = 0; i < 50; i++) {

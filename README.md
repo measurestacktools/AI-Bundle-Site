@@ -1,31 +1,33 @@
 # AI Bundle — Sales Site
 
 Landing page + Cloudflare Pages Functions for the AI Projects Bundle (₹249).
-Checkout runs through Cashfree, the ZIP is delivered from Workers KV behind a
-D1 PAID gate, and customers can optionally sign in with Google to see their
-purchases and re-download.
+Buying requires signing in with Google: checkout has no email or mobile form,
+the order email comes from the verified session, and every purchase is saved to
+the account so the Orders page can re-download it any time. Payment runs through
+Cashfree and the ZIP is delivered from Workers KV behind a D1 PAID gate.
 
 ## Pages
 
-`index`, `bundle`, `success`, `track-order`, `purchases`, `account`, `contact`,
-`refund`, `privacy`. Static assets live in `assets/`; the built ZIP is never
-served as a file — the only read path is `/api/download` after a PAID check.
+`index`, `bundle`, `success`, `account` (Orders), `contact`, `refund`,
+`privacy`. Static assets live in `assets/`; the built ZIP is never served as a
+file — the only read path is `/api/download` after a PAID check.
 
 ## API (Pages Functions)
 
-- `POST /api/create-order` — validates email, creates a ₹249 Cashfree order.
+- `POST /api/create-order` — signed-in only; email comes from the session,
+  amount always from the server, Cashfree gets a dummy phone.
 - `GET /api/payment-status` — polls the order status for `success.html`.
 - `POST /api/cashfree/webhook` — HMAC-verified, idempotent PAID marker.
 - `POST /api/create-download` / `GET /api/download` — single-use 10-minute tokens.
-- `POST /api/request-access-code` / `POST /api/verify-access-code` — email-code recovery.
-- `GET /api/order-lookup` — no-enumeration order status lookup.
 - `GET /api/auth/config`, `POST /api/auth/google`, `POST /api/auth/logout`,
-  `GET /api/auth/session`, `POST /api/account/download` — optional Google accounts.
+  `GET /api/auth/session`, `POST /api/account/download` — Google accounts + orders.
 
 The Google flow uses the GIS **ID-token** flow: the browser posts a signed
 Google JWT, and the Function verifies it against Google's JWKS. There is no
 client secret. Sessions are random tokens stored as SHA-256 hashes and sent as
-an `HttpOnly; Secure; SameSite=Lax` cookie.
+an `HttpOnly; Secure; SameSite=Lax` cookie. `/api/auth/session` returns the
+account's orders with their status, which drives automatic tracking on the
+Orders page.
 
 ## Run locally
 
@@ -42,6 +44,7 @@ Full local stack (Functions + local D1/KV):
 npx wrangler d1 execute ai-bundle-orders --local --config wrangler.local.toml --file migrations/0001_init.sql
 npx wrangler d1 execute ai-bundle-orders --local --config wrangler.local.toml --file migrations/0002_access.sql
 npx wrangler d1 execute ai-bundle-orders --local --config wrangler.local.toml --file migrations/0003_accounts.sql
+npx wrangler d1 execute ai-bundle-orders --local --config wrangler.local.toml --file migrations/0004_order_account.sql
 ```
 
 `wrangler pages dev` only accepts `wrangler.toml`, so swap `wrangler.local.toml`
@@ -51,10 +54,8 @@ in temporarily if you need the full stack locally. Put local-only values such as
 ## Tests
 
 ```powershell
-node scripts/test-step3.mjs   # order/email/webhook/secret-scan
-node scripts/test-lookup.mjs  # no-enumeration lookup
-node scripts/test-access.mjs  # email-code + token redemption
-node scripts/test-auth.mjs    # Google token verify, sessions, ownership gates
+node scripts/test-step3.mjs   # order price/webhook/secret-scan
+node scripts/test-auth.mjs    # Google tokens, sessions, sign-in-gated checkout, ownership
 ```
 
 ## Deploy

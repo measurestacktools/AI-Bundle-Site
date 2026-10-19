@@ -12,7 +12,7 @@ import {
   PRODUCT,
 } from "../../_lib/validate.js";
 import { getOrderById } from "../../_lib/db.js";
-import { readSessionToken, getSessionAccount } from "../../_lib/accounts.js";
+import { readSessionToken, getSessionAccount, orderBelongsToAccount } from "../../_lib/accounts.js";
 import { createDownloadToken } from "../../_lib/access.js";
 
 export async function onRequestPost(context) {
@@ -32,7 +32,7 @@ export async function onRequestPost(context) {
       !order ||
       order.status !== "PAID" ||
       order.product_id !== PRODUCT.id ||
-      String(order.email || "").trim().toLowerCase() !== account.email
+      !orderBelongsToAccount(order, account)
     ) {
       return json({ ok: false }, 403);
     }

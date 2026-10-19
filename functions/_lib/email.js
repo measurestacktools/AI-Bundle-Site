@@ -27,7 +27,7 @@ export async function sendPurchaseEmail(env, { to, orderId, downloadUrl, siteUrl
           `<p><strong>AI Projects Bundle</strong><br/>Order ${escapeHtml(orderId)} · ₹249 one-time</p>` +
           `<p><a href="${escapeHtml(downloadUrl)}">Download your ZIP</a> — ` +
           `this link is personal to your order and always checks payment status. ` +
-          `You can generate a fresh link anytime from your <a href="${escapeHtml(siteUrl)}/success.html?oid=${encodeURIComponent(orderId)}">purchase page</a>.</p>` +
+          `You can download it again anytime from your <a href="${escapeHtml(siteUrl)}/account.html">Orders page</a>.</p>` +
           `<p>Setup: unzip, add your free Groq API key per any project README, run locally.</p>` +
           `<p>Questions: see ${escapeHtml(siteUrl)}/contact.html</p>`,
       }),
@@ -45,38 +45,4 @@ export async function sendPurchaseEmail(env, { to, orderId, downloadUrl, siteUrl
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
-// One-time purchase-access code. Returns { sent: true } | { sent: false, reason }.
-export async function sendAccessCode(env, { to, code }) {
-  if (!emailConfigured(env)) {
-    console.log("[email] access code skipped: provider not configured");
-    return { sent: false, reason: "provider_not_configured" };
-  }
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.RESEND_API_KEY}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        from: env.RESEND_FROM,
-        to: [to],
-        subject: "Your bundle access code (valid 10 minutes)",
-        html:
-          `<p>Your AI Projects Bundle access code is:</p>` +
-          `<p style="font-size:28px;font-weight:bold;letter-spacing:6px">${escapeHtml(code)}</p>` +
-          `<p>It expires in 10 minutes and works once. If you didn't ask for this, ignore this email.</p>`,
-      }),
-    });
-    if (!res.ok) {
-      console.log(`[email] access code provider error http_${res.status}`);
-      return { sent: false, reason: `provider_http_${res.status}` };
-    }
-    return { sent: true };
-  } catch (e) {
-    console.log("[email] access code send failed");
-    return { sent: false, reason: "send_failed" };
-  }
 }

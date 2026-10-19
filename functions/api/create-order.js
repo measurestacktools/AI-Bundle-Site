@@ -1,9 +1,17 @@
-// POST /api/create-order  { email } -> { order_id, payment_session_id, cf_order_id, amount, currency, mode }
-// Price ALWAYS comes from server-side PRODUCT. The browser can never set it.
-import { PRODUCT, isValidEmail, readJsonBody, json, errorToResponse, rateLimit, clientIp } from "../_lib/validate.js";
+// POST /api/create-order — signed-in customers only.
+// Price ALWAYS comes from server-side PRODUCT. The browser can never set it,
+// and the purchase email ALWAYS comes from the verified session cookie, so a
+// customer cannot buy under an email they do not control.
+import { PRODUCT, json, errorToResponse, rateLimit, clientIp } from "../_lib/validate.js";
 import { newOrderId, sha256Hex } from "../_lib/crypto.js";
 import { createOrderRow } from "../_lib/db.js";
 import { cashfreeConfigured, cfCreateOrder } from "../_lib/cashfree.js";
+import { readSessionToken, getSessionAccount } from "../_lib/accounts.js";
+
+// Cashfree requires a customer_phone value on the order object. Customers are
+// never asked for a mobile number; a fixed dummy value satisfies the API
+// (Cashfree explicitly allows dummy customer details).
+const DUMMY_PHONE = "9999999999";
 
 export async function onRequestPost(context) {
   try {
@@ -14,18 +22,10 @@ export async function onRequestPost(context) {
     if (!env.DB) return json({ ok: false, error: "Checkout is not configured yet" }, 503);
     if (!cashfreeConfigured(env)) return json({ ok: false, error: "Checkout is not configured yet" }, 503);
 
-    const body = await readJsonBody(request);
-    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    if (!isValidEmail(email)) return json({ ok: false, error: "Enter a valid email address" }, 400);
-    // Cashfree mandates customer_phone: required here, validated strictly.
-    // Email remains the purchase identifier; no account is created.
-    let phone = "";
-    if (typeof body.phone === "string") {
-      phone = body.phone.replace(/[^\d]/g, "").replace(/^91(?=\d{10}$)/, "");
-    }
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      return json({ ok: false, error: "Enter a valid 10-digit mobile number" }, 400);
-    }
+    const account = await getSessionAccount(env.DB, readSessionToken(request));
+    if (!account) return json({ ok: false, error: "Sign in with Google to continue" }, 401);
+    const email = String(account.email || "").trim().toLowerCase();
+    if (!email) return json({ ok: false, error: "Sign in with Google to continue" }, 401);
 
     const siteUrl = (env.SITE_URL || "https://aiprojectsbundle.pages.dev").replace(/\/$/, "");
     const internalId = newOrderId();
@@ -41,8 +41,9 @@ export async function onRequestPost(context) {
         amount: PRODUCT.price,
         currency: PRODUCT.currency,
         email,
-        phone,
+        phone: DUMMY_PHONE,
         customerId,
+        customerName: account.name || "Bundle Customer",
         returnUrl: `${siteUrl}/success.html?oid=${encodeURIComponent(internalId)}`.slice(0, 250),
         notifyUrl: `${siteUrl}/api/cashfree/webhook`.slice(0, 250),
         note: "AI Projects Bundle",
@@ -60,6 +61,7 @@ export async function onRequestPost(context) {
       id: internalId,
       cashfreeOrderId: String(cf.order_id),
       email,
+      accountId: account.account_id,
       productId: PRODUCT.id,
       amount: PRODUCT.price,
       currency: PRODUCT.currency,

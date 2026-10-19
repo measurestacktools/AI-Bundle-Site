@@ -1,8 +1,10 @@
 # STEP 3 — Cashfree + Workers KV + D1 setup (AI Projects Bundle, ₹249)
 
-Funnel: bundle.html Buy Now → email modal → `POST /api/create-order` (₹249, server-side)
-→ cashfree.js checkout → return `success.html?oid=` → poll `GET /api/payment-status`
-→ webhook verifies + marks PAID → `POST /api/create-download` → same-origin download streamed from Workers KV.
+Funnel: bundle.html Buy Now → Google sign-in (session cookie) → `POST /api/create-order`
+(₹249 server-side; email from the session, dummy phone to Cashfree) → cashfree.js checkout
+→ return `success.html?oid=` → poll `GET /api/payment-status` → webhook verifies + marks PAID
+→ `POST /api/account/download` → single-use link → same-origin download streamed from Workers KV.
+The Orders page (`account.html`) lists every order automatically and re-downloads PAID ones.
 
 No secrets live in the repo. Everything secret is a Cloudflare dashboard secret/binding.
 
@@ -49,6 +51,7 @@ Apply to **Production and Preview** (or Production only, your call).
    `wrangler d1 execute ai-bundle-orders --remote --file migrations/0001_init.sql`
    `wrangler d1 execute ai-bundle-orders --remote --file migrations/0002_access.sql`
    `wrangler d1 execute ai-bundle-orders --remote --file migrations/0003_accounts.sql`
+   `wrangler d1 execute ai-bundle-orders --remote --file migrations/0004_order_account.sql`
 3. Pages project → Settings → Bindings → Add **D1** binding named `DB`.
 
 ## 5. Cashfree webhook URL
@@ -91,21 +94,25 @@ Google's public JWKS before creating a session cookie.
 6. No extra binding is needed — the page loads the public client ID from
    `GET /api/auth/config`, and the Function uses the existing `DB` binding.
 
-Ownership rules: an account only sees orders whose checkout email matches its
-**Google-verified** email, and only PAID orders. Downloads are minted as
-single-use 10-minute tokens. The email-code flow on `purchases.html` remains
-as a fallback for customers who do not use Google.
+Buying is sign-in gated: `POST /api/create-order` returns 401 without a valid
+session and always uses the session's verified email, so nobody can purchase
+under an address they do not own. Customers are never asked for an email or a
+mobile number; the server passes a fixed dummy phone to Cashfree (Cashfree
+explicitly allows dummy customer details).
+
+Ownership rules: an account sees orders it created (`account_id`) plus older
+rows with the same email, and only PAID orders can be downloaded. Downloads are
+minted as single-use 10-minute tokens.
 
 Local tests: `node scripts/test-auth.mjs` (real RS256 signatures, mocked JWKS
 and D1; covers tampered/wrong-aud/expired/unverified tokens, session expiry,
-and the order-ownership gate).
+the sign-in-gated checkout, dummy phone, and the order-ownership gate).
 
 ## 9. Local tests
 
-`node scripts/test-step3.mjs` — validates email rules, webhook HMAC roundtrip,
-order-id format, amount gating, and scans the repo for secret patterns.
-Also `node scripts/test-lookup.mjs`, `node scripts/test-access.mjs`, and
-`node scripts/test-auth.mjs`.
+`node scripts/test-step3.mjs` — validates webhook HMAC roundtrip, order-id
+format, server-side amount gating, the sign-in gate, dummy phone, and scans the
+repo for secret patterns. Also `node scripts/test-auth.mjs`.
 
 ## 10. Deploy
 
@@ -115,10 +122,18 @@ Non-interactive shells need `CLOUDFLARE_API_TOKEN` set (Pages:Edit + D1:Edit).
 
 ## 11. Sandbox purchase test
 
-1. Open `/bundle.html` → Buy Now → enter email → pay with a Cashfree test instrument.
+1. Open `/bundle.html` → Buy Now → sign in with Google → Pay ₹249 with a
+   Cashfree test instrument (no email or mobile fields appear).
 2. Return lands on `success.html` → status becomes PAID → download works.
-3. Check D1 row: status PAID, download_count 1. Confirm no duplicate emails on webhook retry.
-4. Confirm download is same-origin from Workers KV, auth re-checked on every request, and unpaid `order_id` gets 403.
+3. Check D1 row: status PAID, `account_id` set, `download_count` 1. Confirm no
+   duplicate emails on webhook retry.
+4. Open `/account.html`: the order is listed with a download button.
+5. Confirm download is same-origin from Workers KV, auth re-checked on every
+   request, and unpaid `order_id` gets 403.
+
+Dummy phone: Cashfree's Create Order API accepts dummy customer details, so the
+server sends a fixed placeholder. If a specific payment method ever rejects it,
+`sandbox` testing will surface it — only then consider collecting a phone.
 
 ## 12. Go production
 

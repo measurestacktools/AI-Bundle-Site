@@ -10,7 +10,7 @@ export async function onRequestGet(context) {
     if (!env.DB) return json({ ok: true, account: null, orders: [], configured: false });
     const account = await getSessionAccount(env.DB, readSessionToken(request));
     if (!account) return json({ ok: true, account: null, orders: [], configured: Boolean(env.GOOGLE_CLIENT_ID) });
-    const orders = await findOrdersForAccount(env.DB, account.email, PRODUCT.id);
+    const orders = await findOrdersForAccount(env.DB, account.account_id, account.email, PRODUCT.id);
     return json({
       ok: true,
       configured: Boolean(env.GOOGLE_CLIENT_ID),
@@ -19,7 +19,12 @@ export async function onRequestGet(context) {
         name: account.name || null,
         picture: account.picture || null,
       },
-      orders: orders.map((o) => ({ order_id: o.id, paid_at: o.paid_at })),
+      orders: orders.map((o) => ({
+        order_id: o.id,
+        status: o.status,
+        paid_at: o.paid_at,
+        created_at: o.created_at,
+      })),
     });
   } catch (err) {
     return errorToResponse(err);
