@@ -43,6 +43,7 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
 
 /* buttons */
 .btn{display:inline-block;font-family:var(--mono);font-weight:700;border-radius:8px;padding:14px 28px;font-size:15px;cursor:pointer;border:2px solid var(--line);text-decoration:none;transition:transform .12s,box-shadow .12s;box-shadow:var(--hard-sm)}
+[hidden]{display:none !important}
 .btn-primary{background:var(--signal);color:var(--signal-ink)}
 .btn-primary:hover{transform:translate(-1px,-1px);box-shadow:var(--hard)}
 .btn-ghost{background:var(--card);color:var(--ink)}

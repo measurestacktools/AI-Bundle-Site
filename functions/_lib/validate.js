@@ -41,11 +41,10 @@ export async function readJsonBody(request, maxBytes = MAX_BODY_BYTES) {
   }
 }
 
-export function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-  });
+export function json(data, status = 200, extraHeaders = null) {
+  const headers = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
+  if (extraHeaders) Object.assign(headers, extraHeaders);
+  return new Response(JSON.stringify(data), { status, headers });
 }
 
 export function errorToResponse(err) {
