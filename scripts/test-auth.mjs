@@ -12,6 +12,7 @@ import {
   getSessionAccount,
   deleteSession,
 } from "../functions/_lib/accounts.js";
+import { normalizePhone, isValidPhone } from "../functions/_lib/validate.js";
 
 let pass = 0;
 const ok = (name, cond) => { assert(cond, `FAIL: ${name}`); pass++; console.log(`ok: ${name}`); };
@@ -151,8 +152,8 @@ function makeDb(seedOrders = {}) {
           if (q.startsWith("INSERT INTO orders")) {
             t.orders[args[0]] = {
               id: args[0], cashfree_order_id: args[1], email: args[2], account_id: args[3],
-              product_id: args[4], amount: args[5], currency: args[6], status: "CREATED",
-              created_at: args[7], paid_at: null,
+              product_id: args[4], amount: args[5], currency: args[6], phone: args[7], status: "CREATED",
+              created_at: args[8], paid_at: null,
             };
             return { meta: { changes: 1 } };
           }
@@ -283,18 +284,32 @@ async function upsert(db) {
   let r = await call(createOrder, "https://x/api/create-order", { method: "POST" }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
   ok("create-order without session -> 401", r.status === 401 && cashfreeCalls.length === 0);
 
-  r = await call(createOrder, "https://x/api/create-order", { method: "POST", cookie }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
+  r = await call(createOrder, "https://x/api/create-order", { method: "POST", body: { phone: "9876543210" }, cookie }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
   ok("signed-in create-order -> payment session", r.status === 200 && r.body.ok === true && r.body.payment_session_id === "session_test_123");
 
   const sent = cashfreeCalls[0];
   ok("cashfree gets the session email", Boolean(sent) && sent.customer_details.customer_email === "buyer@example.com");
-  ok("cashfree gets a dummy phone (customers are never asked)", Boolean(sent) && sent.customer_details.customer_phone === "9999999999");
+  ok("cashfree gets the customer phone", Boolean(sent) && sent.customer_details.customer_phone === "9876543210");
+
+  r = await call(createOrder, "https://x/api/create-order", { method: "POST", body: { phone: "12345" }, cookie }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
+  ok("invalid phone -> 400 with exact error", r.status === 400 && r.body.ok === false && r.body.error === "Enter a valid 10-digit mobile number" && cashfreeCalls.length === 1);
+
+  r = await call(createOrder, "https://x/api/create-order", { method: "POST", cookie }, { DB: db, ...CF_ENV, GOOGLE_CLIENT_ID: CLIENT_ID });
+  ok("missing phone -> 400", r.status === 400 && r.body.error === "Enter a valid 10-digit mobile number" && cashfreeCalls.length === 1);
 
   const row = Object.values(db.tables.orders)[0];
   ok(
-    "order stores account_id + session email",
-    Boolean(row) && row.account_id === accountId && row.email === "buyer@example.com" && row.status === "CREATED"
+    "order stores account_id + session email + phone",
+    Boolean(row) && row.account_id === accountId && row.email === "buyer@example.com" && row.phone === "9876543210" && row.status === "CREATED"
   );
+}
+
+// --- phone normalization -----------------------------------------------------
+{
+  ok("normalize +91 spaced phone", normalizePhone("+91 98765 43210") === "9876543210" && isValidPhone("+91 98765 43210"));
+  ok("normalize leading-zero phone", normalizePhone("09876543210") === "9876543210" && isValidPhone("09876543210"));
+  ok("reject phone starting with 1", normalizePhone("1234567890") === "1234567890" && !isValidPhone("1234567890"));
+  ok("reject short phone", normalizePhone("98765") === "" && !isValidPhone("98765"));
 }
 
 // --- no self-asserted identity ----------------------------------------------

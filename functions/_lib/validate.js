@@ -2,7 +2,7 @@
 export const PRODUCT = Object.freeze({
   id: "ai-projects-bundle",
   name: "AI Projects Bundle",
-  price: 1,
+  price: 249,
   currency: "INR",
 });
 
@@ -18,6 +18,19 @@ export function isValidEmail(email) {
 
 export function isValidOrderId(id) {
   return typeof id === "string" && /^[A-Za-z0-9_-]{8,64}$/.test(id);
+}
+
+export function normalizePhone(value) {
+  if (typeof value !== "string" && typeof value !== "number") return "";
+  let digits = String(value).replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
+  else if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
+  return digits.length === 10 ? digits : "";
+}
+
+export function isValidPhone(value) {
+  const phone = normalizePhone(value);
+  return /^[6-9]\d{9}$/.test(phone);
 }
 
 export async function readJsonBody(request, maxBytes = MAX_BODY_BYTES) {

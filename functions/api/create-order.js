@@ -2,16 +2,11 @@
 // Price ALWAYS comes from server-side PRODUCT. The browser can never set it,
 // and the purchase email ALWAYS comes from the verified session cookie, so a
 // customer cannot buy under an email they do not control.
-import { PRODUCT, json, errorToResponse, rateLimit, clientIp } from "../_lib/validate.js";
+import { PRODUCT, json, errorToResponse, rateLimit, clientIp, normalizePhone, isValidPhone } from "../_lib/validate.js";
 import { newOrderId, sha256Hex } from "../_lib/crypto.js";
 import { createOrderRow } from "../_lib/db.js";
 import { cashfreeConfigured, cfCreateOrder } from "../_lib/cashfree.js";
 import { readSessionToken, getSessionAccount } from "../_lib/accounts.js";
-
-// Cashfree requires a customer_phone value on the order object. Customers are
-// never asked for a mobile number; a fixed dummy value satisfies the API
-// (Cashfree explicitly allows dummy customer details).
-const DUMMY_PHONE = "9999999999";
 
 export async function onRequestPost(context) {
   try {
@@ -27,6 +22,10 @@ export async function onRequestPost(context) {
     const email = String(account.email || "").trim().toLowerCase();
     if (!email) return json({ ok: false, error: "Sign in with Google to continue" }, 401);
 
+    const body = await request.json().catch(() => ({}));
+    const phone = normalizePhone(body && body.phone);
+    if (!isValidPhone(phone)) return json({ ok: false, error: "Enter a valid 10-digit mobile number" }, 400);
+
     const siteUrl = (env.SITE_URL || "https://aiprojectsbundle.pages.dev").replace(/\/$/, "");
     const internalId = newOrderId();
     // Cashfree order id: unique per request; ties webhook/payment back to our row.
@@ -41,7 +40,7 @@ export async function onRequestPost(context) {
         amount: PRODUCT.price,
         currency: PRODUCT.currency,
         email,
-        phone: DUMMY_PHONE,
+        phone,
         customerId,
         customerName: account.name || "Bundle Customer",
         returnUrl: `${siteUrl}/success.html?oid=${encodeURIComponent(internalId)}`.slice(0, 250),
@@ -65,6 +64,7 @@ export async function onRequestPost(context) {
       productId: PRODUCT.id,
       amount: PRODUCT.price,
       currency: PRODUCT.currency,
+      phone,
     });
 
     return json({

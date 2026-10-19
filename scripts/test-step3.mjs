@@ -23,7 +23,7 @@ ok("create-order requires a signed-in session", /getSessionAccount/.test(src) &&
 ok("create-order takes the email from the session, never the browser", !/body\.email/.test(src));
 {
   const cf = readFileSync(join(root, "functions/_lib/cashfree.js"), "utf8");
-  ok("no mobile number collected; server sends a dummy phone", /DUMMY_PHONE/.test(src) && /customer_phone/.test(cf));
+  ok("create-order requires a customer phone and passes it to cashfree", /normalizePhone/.test(src) && /isValidPhone/.test(src) && /customer_phone/.test(cf) && !/DUMMY_PHONE/.test(src));
 }
 
 // order id format (Cashfree: 3-45 chars, [A-Za-z0-9_-])
