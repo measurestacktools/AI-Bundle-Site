@@ -6,10 +6,21 @@
 //  - Session cookie is HttpOnly + Secure + SameSite=Lax, so JS can't read it
 //    and cross-site POSTs don't carry it.
 import { nowIso } from "./db.js";
-import { sha256Hex, randomHex } from "./crypto.js";
+import {
+  sha256Hex,
+  randomHex,
+  pbkdf2Hex,
+  safeEqual,
+  PASSWORD_ITERATIONS,
+  PASSWORD_SALT_BYTES,
+} from "./crypto.js";
 
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 export const SESSION_COOKIE = "aib_session";
+
+export const MIN_PASSWORD_LENGTH = 8;
+export const MAX_PASSWORD_LENGTH = 200;
+export const MAX_NAME_LENGTH = 80;
 
 const GOOGLE_ISSUERS = new Set(["accounts.google.com", "https://accounts.google.com"]);
 const JWKS_URL = "https://www.googleapis.com/oauth2/v3/certs";
@@ -150,6 +161,82 @@ export async function upsertAccount(db, claims) {
     .bind(id, claims.sub, email, claims.name || null, claims.picture || null, now, now)
     .run();
   return id;
+}
+
+// ---- email + password accounts ---------------------------------------------
+// Password rows live in the same accounts table as Google rows. `google_sub`
+// is NOT NULL in the original schema, so password accounts get a namespaced
+// synthetic value (`local:<id>`); real Google subject ids are numeric, so the
+// two can never collide.
+
+export function normalizeEmail(email) {
+  return String(email == null ? "" : email).trim().toLowerCase();
+}
+
+export function passwordProblem(password) {
+  if (typeof password !== "string") return "Password is required.";
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return `Password must be at most ${MAX_PASSWORD_LENGTH} characters.`;
+  }
+  return "";
+}
+
+export async function findAccountByEmail(db, email) {
+  return db
+    .prepare(
+      `SELECT id, google_sub, email, name, picture, password_hash, password_salt, password_iters
+       FROM accounts WHERE email = ?`
+    )
+    .bind(normalizeEmail(email))
+    .first();
+}
+
+export async function createPasswordAccount(db, { email, password, name }) {
+  const id = `acc_${randomHex(12)}`;
+  const salt = randomHex(PASSWORD_SALT_BYTES);
+  const hash = await pbkdf2Hex(password, salt, PASSWORD_ITERATIONS);
+  const now = nowIso();
+  await db
+    .prepare(
+      `INSERT INTO accounts
+         (id, google_sub, email, name, picture, created_at, last_login_at,
+          password_hash, password_salt, password_iters)
+       VALUES (?, ?, ?, ?, NULL, ?, ?, ?, ?, ?)`
+    )
+    // Deterministic namespaced subject: the UNIQUE constraint then guarantees
+    // one password account per email even under a concurrent double-submit.
+    .bind(
+      id,
+      `local:${await sha256Hex(normalizeEmail(email))}`,
+      normalizeEmail(email),
+      name || null,
+      now,
+      now,
+      hash,
+      salt,
+      PASSWORD_ITERATIONS
+    )
+    .run();
+  return { id, email: normalizeEmail(email), name: name || null, picture: null };
+}
+
+// Returns the session-shaped account on success, null on any failure.
+export async function verifyPasswordAccount(db, email, password) {
+  const row = await findAccountByEmail(db, email);
+  if (!row || !row.password_hash || !row.password_salt) {
+    // Burn the same PBKDF2 cost for unknown/Google-only accounts so response
+    // timing does not reveal which emails exist.
+    await pbkdf2Hex(password, "00".repeat(PASSWORD_SALT_BYTES), PASSWORD_ITERATIONS).catch(() => {});
+    return null;
+  }
+  const iterations = Number(row.password_iters) || PASSWORD_ITERATIONS;
+  const candidate = await pbkdf2Hex(password, row.password_salt, iterations);
+  if (!safeEqual(candidate, row.password_hash)) return null;
+  await db.prepare(`UPDATE accounts SET last_login_at = ? WHERE id = ?`).bind(nowIso(), row.id).run();
+  return { account_id: row.id, email: row.email, name: row.name, picture: row.picture };
 }
 
 export async function createSession(db, accountId) {

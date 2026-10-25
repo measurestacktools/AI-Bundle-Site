@@ -7,13 +7,24 @@ import { readSessionToken, getSessionAccount, findOrdersForAccount } from "../..
 export async function onRequestGet(context) {
   try {
     const { request, env } = context;
-    if (!env.DB) return json({ ok: true, account: null, orders: [], configured: false });
+    if (!env.DB) {
+      return json({ ok: true, account: null, orders: [], configured: false, password_auth: false });
+    }
     const account = await getSessionAccount(env.DB, readSessionToken(request));
-    if (!account) return json({ ok: true, account: null, orders: [], configured: Boolean(env.GOOGLE_CLIENT_ID) });
+    if (!account) {
+      return json({
+        ok: true,
+        account: null,
+        orders: [],
+        configured: Boolean(env.GOOGLE_CLIENT_ID),
+        password_auth: true,
+      });
+    }
     const orders = await findOrdersForAccount(env.DB, account.account_id, account.email, PRODUCT.id);
     return json({
       ok: true,
       configured: Boolean(env.GOOGLE_CLIENT_ID),
+      password_auth: true,
       account: {
         email: account.email,
         name: account.name || null,
