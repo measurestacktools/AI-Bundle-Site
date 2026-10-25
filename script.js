@@ -20,9 +20,16 @@ var CONFIG = {
   "use strict";
 
   /* price injection (single source of truth) */
-  document.querySelectorAll("[data-price]").forEach(function (el) {
-    el.textContent = CONFIG.PRICE;
-  });
+  function applyPrice(text) {
+    document.querySelectorAll("[data-price]").forEach(function (el) {
+      el.textContent = text;
+    });
+    document.title = document.title.replace(/\u20b9\s?\d+/, text);
+  }
+  applyPrice(CONFIG.PRICE);
+  fetch("/api/auth/config").then(function (r) { return r.json(); }).then(function (d) {
+    if (d && d.ok && d.price) applyPrice("\u20b9" + d.price);
+  }).catch(function () {});
 
   /* buy buttons: live URL -> go pay; placeholder -> go to bundle page */
   function wireBuy(btn) {
