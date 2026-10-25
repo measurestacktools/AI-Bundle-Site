@@ -2,7 +2,7 @@
    /api/auth/session, /api/auth/logout. Google stays available via AIBundleAuth. */
 (function () {
   "use strict";
-  var HELP_EMAIL = ""; // owner email; set once, used by the Help link
+  var HELP_EMAIL = "support@eggermath.com"; // owner email; set once, used by the Help link
   var modal, msgEl, tabIn, tabUp, formIn, formUp, googleBox;
 
   var css = document.createElement("style");
