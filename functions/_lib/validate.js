@@ -2,7 +2,7 @@
 export const PRODUCT = Object.freeze({
   id: "ai-projects-bundle",
   name: "AI Projects Bundle",
-  price: 1,
+  price: 249,
   currency: "INR",
 });
 
