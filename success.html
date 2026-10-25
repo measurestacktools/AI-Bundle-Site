@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -26,28 +26,28 @@
     </nav>
     <div class="nav-cta">
       <a class="btn btn-primary btn-sm" href="bundle.html" data-cta>Get the Bundle</a>
-      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Open menu">☰</button>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Open menu">â˜°</button>
     </div>
   </div>
 </header>
 <main id="main">
 <section class="section">
   <div class="wrap narrow">
-    <p class="pill">◈ Order status</p>
-    <h1 class="page-title" id="statusTitle">Confirming your payment…</h1>
-    <p class="section-sub" id="statusSub">Please wait while we verify with the payment gateway. This page never assumes success — it checks the order record.</p>
+    <p class="pill">â—ˆ Order status</p>
+    <h1 class="page-title" id="statusTitle">Confirming your paymentâ€¦</h1>
+    <p class="section-sub" id="statusSub">Please wait while we verify with the payment gateway. This page never assumes success â€” it checks the order record.</p>
     <div class="info-box" id="statusBox">
       <ol class="key-steps" id="statusSteps">
-        <li>⏳ Waiting for payment confirmation…</li>
+        <li>â³ Waiting for payment confirmationâ€¦</li>
       </ol>
     </div>
     <div class="hero-cta" style="margin-top:18px">
-      <button class="btn btn-primary btn-lg" id="downloadBtn" type="button" hidden>⬇ Download your ZIP</button>
+      <button class="btn btn-primary btn-lg" id="downloadBtn" type="button" hidden>â¬‡ Download your ZIP</button>
       <a class="btn btn-ghost" href="account.html">View all orders</a>
       <a class="btn btn-ghost" href="bundle.html">Back to product</a>
     </div>
     <p class="fine" id="emailNote" hidden>Your download link has also been sent to your email.</p>
-    <p class="fine">Order ID: <code id="orderLabel">—</code></p>
+    <p class="fine">Order ID: <code id="orderLabel">â€”</code></p>
   </div>
 </section>
 </main>
@@ -75,9 +75,10 @@
 (function () {
   var params = new URLSearchParams(location.search);
   var oid = params.get("oid") || "";
-  document.getElementById("orderLabel").textContent = oid || "—";
+  document.getElementById("orderLabel").textContent = oid || "â€”";
   if (window.AIBundleCheckout) window.AIBundleCheckout.watchOrder(oid);
 })();
 </script>
+  <script src="assets/account-ui.js?v=1" defer></script>
 </body>
 </html>
