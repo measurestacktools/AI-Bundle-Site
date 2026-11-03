@@ -148,6 +148,9 @@ code{background:rgba(33,26,16,.07);border:1px solid var(--line-soft);padding:1px
 .footer{border-top:2px solid var(--line);padding:32px 0 44px;background:var(--card)}
 .foot-inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .footer p{color:var(--faint);font-size:13.5px;margin:6px 0 0}
+.footer p.foot-contact{margin-top:10px}
+.footer p.foot-contact a{color:var(--ink2);text-decoration:none;font-family:var(--mono)}
+.footer p.foot-contact a:hover{color:var(--signal)}
 .footer nav{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 .footer nav a{color:var(--ink2);font-size:13.5px;text-decoration:none;font-family:var(--mono)}
 .footer nav a:hover{color:var(--signal)}
