@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Admin — Keepsake</title>
+<style>
+  :root { --bg:#0d0e12; --card:#15161c; --line:#262833; --ink:#eceef6; --dim:#8e93a8; --acc:#7c5cff; --ok:#31c48d; --warn:#f0b429; --bad:#f05252; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  .wrap { max-width:920px; margin:0 auto; padding:28px 18px 60px; }
+  h1 { font-size:18px; margin:0 0 4px; }
+  .sub { color:var(--dim); font-size:12.5px; margin-bottom:22px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+  label { display:block; font-size:12px; color:var(--dim); margin-bottom:10px; }
+  input { display:block; width:100%; margin-top:6px; padding:10px 12px; border-radius:9px; border:1px solid var(--line); background:#0f1015; color:var(--ink); font-size:14px; }
+  input:focus { outline:none; border-color:var(--acc); }
+  button { background:var(--acc); color:#fff; border:0; border-radius:9px; padding:10px 14px; font-size:13px; cursor:pointer; font-weight:600; }
+  button.ghost { background:#1d1f27; color:#c6cadb; border:1px solid var(--line); font-weight:500; }
+  button:disabled { opacity:.6; cursor:default; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
+  .stat { background:#0f1015; border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .stat b { display:block; font-size:22px; line-height:1.2; }
+  .stat span { font-size:11.5px; color:var(--dim); }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  th { text-align:left; color:var(--dim); font-weight:500; padding:8px 6px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:8px 6px; border-bottom:1px solid #1c1e26; }
+  .tag { font-size:11px; padding:2px 7px; border-radius:999px; border:1px solid var(--line); }
+  .tag.paid { color:var(--ok); border-color:#1e5a45; }
+  .tag.exp { color:var(--warn); border-color:#5a4a1e; }
+  .tag.dead { color:var(--bad); border-color:#5a2121; }
+  .msg { font-size:13px; padding:10px 12px; border-radius:9px; margin-top:12px; display:none; }
+  .msg.err { display:block; background:rgba(240,82,82,.12); color:#ffb4b4; border:1px solid rgba(240,82,82,.3); }
+  .msg.ok { display:block; background:rgba(49,196,141,.12); color:#9ae6c4; border:1px solid rgba(49,196,141,.3); }
+  .muted { color:var(--dim); font-size:12px; }
+  @media (max-width:600px){ th:nth-child(3), td:nth-child(3){ display:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Keepsake — subscription monitor</h1>
+  <div class="sub">Private. Only the account owner can read this data.</div>
+
+  <div class="card" id="loginCard">
+    <form id="loginForm">
+      <label>Admin email<input id="email" type="email" autocomplete="username" required /></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required /></label>
+      <button type="submit" id="loginBtn">Sign in</button>
+    </form>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="dash" hidden>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:14px">
+        <div class="muted" id="stamp"></div>
+        <div class="row">
+          <button class="ghost" id="refreshBtn">Refresh</button>
+          <button class="ghost" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+      <div class="grid" id="stats"></div>
+    </div>
+    <div class="card">
+      <div class="muted" style="margin-bottom:8px">Accounts</div>
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr><th>Email</th><th>Plan</th><th>Expires</th><th>Last backup</th><th>Points</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card"><div class="muted" id="storage"></div></div>
+  </div>
+
+  <div class="msg" id="msg"></div>
+</div>
+
+<script>
+(function () {
+  var URL_BASE = 'https://tladurteudtirajdgpse.supabase.co';
+  var KEY = 'sb_publishable_orFvSLTdWTd41BdRhU5Tsw_G4LZ85Xr';
+  var token = null;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function fmt(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d)) return '—';
+    return d.toLocaleString();
+  }
+  function kb(n) { n = n || 0; return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB'; }
+  function show(el, text, ok) {
+    el.textContent = text;
+    el.className = 'msg ' + (ok ? 'ok' : 'err');
+  }
+
+  function planTag(u) {
+    if (u.plan === 'free' || !u.plan) return '<span class="tag">free</span>';
+    var exp = u.plan_expires_at ? Date.parse(u.plan_expires_at) : 0;
+    if (exp && exp <= Date.now()) return '<span class="tag dead">expired</span>';
+    if (exp && exp - Date.now() < 7 * 864e5) return '<span class="tag exp">ending soon</span>';
+    return '<span class="tag paid">active</span>';
+  }
+
+  async function signIn(email, password) {
+    var res = await fetch(URL_BASE + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: { apikey: KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var data = await res.json().catch(function () { return null; });
+    if (!res.ok) throw new Error((data && (data.error_description || data.msg || data.message)) || 'Sign in failed');
+    token = data.access_token;
+    return data;
+  }
+
+  async function load() {
+    var res = await fetch(URL_BASE + '/rest/v1/rpc/admin_stats', {
+      method: 'POST',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    var data = await res.json().catch(function () { return null; });
+    if (!res.ok) throw new Error((data && (data.message || data.hint)) || 'Could not load stats');
+    return data;
+  }
+
+  function render(d) {
+    var stats = [
+      ['Accounts', d.accounts],
+      ['Paid', d.paid],
+      ['Expiring 7d', d.expiring_7d],
+      ['Expired', d.expired],
+      ['Backups', d.backups],
+      ['Restore points', d.restore_points]
+    ];
+    $('stats').innerHTML = stats.map(function (s) {
+      return '<div class="stat"><b>' + esc(s[1]) + '</b><span>' + esc(s[0]) + '</span></div>';
+    }).join('');
+    $('stamp').textContent = 'Updated ' + fmt(d.generated_at);
+    $('storage').textContent = 'Cloud storage: backups ' + kb(d.bytes_backups) + ' · restore points ' + kb(d.bytes_points);
+
+    var users = d.users || [];
+    $('rows').innerHTML = users.length ? users.map(function (u) {
+      return '<tr><td>' + esc(u.email) + '</td><td>' + planTag(u) + '</td><td>' + esc(fmt(u.plan_expires_at)) +
+        '</td><td>' + esc(fmt(u.last_backup)) + '</td><td>' + esc(u.points || 0) + '</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="muted">No accounts yet.</td></tr>';
+  }
+
+  $('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = $('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    try {
+      await signIn($('email').value.trim(), $('password').value);
+      $('password').value = '';
+      $('loginCard').hidden = true;
+      $('dash').hidden = false;
+      render(await load());
+    } catch (err) {
+      $('loginCard').hidden = false;
+      $('dash').hidden = true;
+      show($('loginMsg'), err.message, false);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign in';
+    }
+  });
+
+  $('refreshBtn').addEventListener('click', async function () {
+    try { render(await load()); } catch (err) { show($('msg'), err.message, false); }
+  });
+
+  $('signOutBtn').addEventListener('click', function () {
+    token = null;
+    $('dash').hidden = true;
+    $('loginCard').hidden = false;
+    $('loginMsg').className = 'msg';
+  });
+})();
+</script>
+</body>
+</html>
