@@ -8,7 +8,9 @@ Cashfree and the ZIP is delivered from Workers KV behind a D1 PAID gate.
 
 ## Live generator
 
-Flagship free tool: [AI Character Chat](https://perchance.org/unlimited-ai-character-chat) — free, no sign-up, no fixed message cap, with optional Keepsake cloud backup and a memory vault.
+[![Unlimited AI Character Chat](https://aiprojectsbundle.pages.dev/assets/og-ai-character-chat.png)](https://perchance.org/unlimited-ai-character-chat)
+
+Flagship free tool: [Unlimited AI Character Chat](https://perchance.org/unlimited-ai-character-chat) — a free Perchance AI chat and Character.AI alternative with no sign-up, no fixed message cap, optional Keepsake cloud backup, and a memory vault.
 
 ## Pages
 
