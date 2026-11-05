@@ -6,6 +6,10 @@ the order email comes from the verified session, and every purchase is saved to
 the account so the Orders page can re-download it any time. Payment runs through
 Cashfree and the ZIP is delivered from Workers KV behind a D1 PAID gate.
 
+## Live generator
+
+Flagship free tool: [AI Character Chat](https://perchance.org/unlimited-ai-character-chat) — free, no sign-up, no fixed message cap, with optional Keepsake cloud backup and a memory vault.
+
 ## Pages
 
 `index`, `bundle`, `success`, `account` (Orders), `contact`, `refund`,
