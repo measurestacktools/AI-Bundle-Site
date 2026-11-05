@@ -293,3 +293,23 @@ img{max-width:100%}
   .info-box{padding:14px}
   .detail .hero-cta .btn{width:100%;text-align:center}
 }
+
+/* --- Free AI Character Chat landing page --- */
+.table-scroll{overflow-x:auto;margin:0 0 8px}
+.ctable{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--line);box-shadow:var(--hard-sm);font-size:14.5px}
+.ctable th,.ctable td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.ctable th{font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;font-size:11.5px;background:var(--paper);color:var(--ink2)}
+.ctable tr:last-child td{border-bottom:0}
+.ctable td:first-child{font-weight:700;color:var(--ink)}
+.ctable .yes{color:#1a7a3c;font-weight:700}
+.ctable .no{color:#a02a1a;font-weight:700}
+.section ul.clean{list-style:none;padding:0;margin:18px 0;display:grid;gap:8px}
+.section ul.clean li{padding-left:1.4em;position:relative;color:var(--ink2);font-size:15px}
+.section ul.clean li::before{content:"?";position:absolute;left:0;color:var(--signal);font-weight:700}
+@media (max-width:640px){
+  .ctable{min-width:560px}
+  .hero{padding:44px 0 24px}
+  .hero h1{font-size:clamp(29px,8vw,40px)}
+}
+.table-hint{display:none}
+@media (max-width:640px){.table-hint{display:block}}
